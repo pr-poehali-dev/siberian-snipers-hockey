@@ -9,6 +9,7 @@ import Icon from "@/components/ui/icon";
 const Index = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = React.useState("players");
+  const [positionFilter, setPositionFilter] = React.useState("all");
 
   const players: Array<{id: number; name: string; number: number; position: string; goals: number; assists: number; image: string; isCaptain?: boolean}> = [
     { id: 1, name: "KRASOTKIN", number: 33, position: "Универсальный", goals: 0, assists: 0, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/01cb72fd-059f-42fa-a829-f343c951ff95.jpg", isCaptain: true },
@@ -82,9 +83,34 @@ const Index = () => {
           </TabsList>
 
           <TabsContent value="players" className="space-y-6 min-h-[400px]">
-            <h2 className="text-4xl font-oswald mb-8">СОСТАВ КОМАНДЫ</h2>
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+              <h2 className="text-4xl font-oswald">СОСТАВ КОМАНДЫ</h2>
+              <div className="flex gap-2 flex-wrap">
+                <Button 
+                  variant={positionFilter === "all" ? "default" : "outline"}
+                  onClick={() => setPositionFilter("all")}
+                  className="font-oswald"
+                >
+                  ВСЕ
+                </Button>
+                <Button 
+                  variant={positionFilter === "Универсальный" ? "default" : "outline"}
+                  onClick={() => setPositionFilter("Универсальный")}
+                  className="font-oswald"
+                >
+                  УНИВЕРСАЛЬНЫЕ
+                </Button>
+                <Button 
+                  variant={positionFilter === "Вратарь" ? "default" : "outline"}
+                  onClick={() => setPositionFilter("Вратарь")}
+                  className="font-oswald"
+                >
+                  ВРАТАРИ
+                </Button>
+              </div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {players.map((player) => (
+              {players.filter(player => positionFilter === "all" || player.position === positionFilter).map((player) => (
                 <Card key={player.id} className="overflow-hidden group hover:shadow-xl transition-all">
                   <div className="relative h-64 overflow-hidden bg-gradient-to-b from-primary/20 to-primary/5">
                     <img 
