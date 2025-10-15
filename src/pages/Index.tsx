@@ -217,7 +217,7 @@ const Index = () => {
               <h4 className="font-oswald text-lg mb-4">КОНТАКТЫ</h4>
               <div className="space-y-3 text-white/80">
                 <a 
-                  href="https://t.me/DeiverEditor" 
+                  href="https://t.me/DriverEditor" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="flex items-center justify-center md:justify-end gap-2 hover:text-white transition-colors"
