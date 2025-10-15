@@ -208,11 +208,19 @@ const Index = () => {
 
       <footer className="bg-primary text-white py-12 mt-16">
         <div className="container mx-auto px-4">
-          <div className="text-center">
-            <h3 className="font-oswald text-2xl mb-4">СИБИРСКИЕ СНАЙПЕРЫ</h3>
-            <p className="text-white/80">Профессиональный хоккейный клуб</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            <div className="text-center md:text-left">
+              <h3 className="font-oswald text-2xl mb-4">СИБИРСКИЕ СНАЙПЕРЫ</h3>
+              <p className="text-white/80">Профессиональный хоккейный клуб</p>
+            </div>
+            <div className="text-center md:text-right">
+              <h4 className="font-oswald text-lg mb-4">КОНТАКТЫ</h4>
+              <div className="space-y-2 text-white/80">
+                <p>Добавьте контактные данные клуба</p>
+              </div>
+            </div>
           </div>
-          <div className="border-t border-white/20 mt-8 pt-8 text-center text-white/60">
+          <div className="border-t border-white/20 pt-8 text-center text-white/60">
             <p>© 2025 Сибирские Снайперы. Все права защищены.</p>
           </div>
         </div>
