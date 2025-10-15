@@ -113,8 +113,15 @@ const Tickets = () => {
   const isFormValid = formData.firstName && formData.lastName && formData.cardNumber.length >= 13;
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="bg-primary text-white py-8">
+    <div className="min-h-screen bg-background relative">
+      <div className="fixed inset-0 pointer-events-none opacity-5 z-0">
+        <img 
+          src="https://cdn.poehali.dev/files/5eafa8e1-7cd4-4959-927d-702849e9a9e9.jpg" 
+          alt="Логотип фон" 
+          className="w-full h-full object-contain"
+        />
+      </div>
+      <div className="bg-primary text-white py-8 relative z-10">
         <div className="container mx-auto px-4">
           <Button
             variant="ghost"
@@ -130,7 +137,7 @@ const Tickets = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 relative z-10">
         <div className="flex gap-4 mb-6">
           <Button
             variant={viewMode === "map" ? "default" : "outline"}

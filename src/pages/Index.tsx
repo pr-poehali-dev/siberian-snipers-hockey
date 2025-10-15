@@ -44,9 +44,16 @@ const Index = () => {
   const management: Array<{name: string; position: string; experience: string}> = [];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      <div className="fixed inset-0 pointer-events-none opacity-5 z-0">
+        <img 
+          src="https://cdn.poehali.dev/files/5eafa8e1-7cd4-4959-927d-702849e9a9e9.jpg" 
+          alt="Логотип фон" 
+          className="w-full h-full object-contain"
+        />
+      </div>
       <div 
-        className="relative h-[600px] bg-cover bg-center flex items-center justify-center text-white"
+        className="relative h-[600px] bg-cover bg-center flex items-center justify-center text-white z-10"
         style={{
           backgroundImage: `linear-gradient(rgba(10, 38, 71, 0.7), rgba(10, 38, 71, 0.85)), url('https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/d96e463a-f0e4-40e5-8913-6f07d929e5ba.jpg')`
         }}
@@ -79,7 +86,7 @@ const Index = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-16">
+      <div className="container mx-auto px-4 py-16 relative z-10">
 
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
