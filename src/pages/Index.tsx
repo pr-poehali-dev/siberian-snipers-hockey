@@ -77,9 +77,9 @@ const Index = () => {
       >
         <div className="text-center space-y-6 animate-fade-in">
           <img 
-            src="https://cdn.poehali.dev/files/6bfdb2cd-0919-40fa-bc61-3c2a3593736e.jpg" 
+            src="https://cdn.poehali.dev/files/097edba3-4667-492c-8fdc-1be95663ce9e.png" 
             alt="Логотип Сибирские Снайперы" 
-            className="w-48 h-48 mx-auto mb-6 object-contain"
+            className="w-64 h-64 mx-auto mb-6 object-contain"
           />
           <h1 className="text-7xl font-oswald font-bold tracking-wider">СИБИРСКИЕ СНАЙПЕРЫ</h1>
           <p className="text-2xl font-roboto tracking-wide">ХОККЕЙНЫЙ КЛУБ</p>
@@ -95,29 +95,7 @@ const Index = () => {
       </div>
 
       <div className="container mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          <Card className="border-primary/20 hover:shadow-lg transition-shadow">
-            <CardHeader className="text-center">
-              <Icon name="Trophy" size={48} className="mx-auto text-accent mb-2" />
-              <CardTitle className="text-3xl font-oswald">18</CardTitle>
-              <p className="text-muted-foreground uppercase text-sm">Побед в сезоне</p>
-            </CardHeader>
-          </Card>
-          <Card className="border-primary/20 hover:shadow-lg transition-shadow">
-            <CardHeader className="text-center">
-              <Icon name="Users" size={48} className="mx-auto text-accent mb-2" />
-              <CardTitle className="text-3xl font-oswald">54</CardTitle>
-              <p className="text-muted-foreground uppercase text-sm">Очка в турнире</p>
-            </CardHeader>
-          </Card>
-          <Card className="border-primary/20 hover:shadow-lg transition-shadow">
-            <CardHeader className="text-center">
-              <Icon name="Target" size={48} className="mx-auto text-accent mb-2" />
-              <CardTitle className="text-3xl font-oswald">1</CardTitle>
-              <p className="text-muted-foreground uppercase text-sm">Место в лиге</p>
-            </CardHeader>
-          </Card>
-        </div>
+
 
         <Tabs defaultValue="players" className="w-full">
           <TabsList className="w-full grid grid-cols-4 mb-8">
