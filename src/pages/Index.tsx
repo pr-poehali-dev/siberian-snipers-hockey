@@ -10,7 +10,19 @@ const Index = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = React.useState("players");
 
-  const players: Array<{id: number; name: string; number: number; position: string; goals: number; assists: number; image: string}> = [];
+  const players: Array<{id: number; name: string; number: number; position: string; goals: number; assists: number; image: string; isCaptain?: boolean}> = [
+    { id: 1, name: "KRASOTKIN", number: 33, position: "Капитан", goals: 15, assists: 22, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/01cb72fd-059f-42fa-a829-f343c951ff95.jpg", isCaptain: true },
+    { id: 2, name: "Lyzenkov", number: 86, position: "Нападающий", goals: 12, assists: 18, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/d0dc5e7d-fcae-4293-a50d-60cd61778d9a.jpg" },
+    { id: 3, name: "Zetka", number: 8, position: "Нападающий", goals: 18, assists: 14, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/54b0bb6d-95e0-40b1-9b51-b4510ea9889d.jpg" },
+    { id: 4, name: "Swafare", number: 91, position: "Защитник", goals: 8, assists: 20, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/5285a795-21e8-4500-b4ea-3ca0d2e51f68.jpg" },
+    { id: 5, name: "Mylnikov Nonprime", number: 20, position: "Вратарь", goals: 0, assists: 2, image: "https://cdn.poehali.dev/files/82b1f898-0098-40f9-9b37-bfc3250ec9a4.png" },
+    { id: 6, name: "Bardakov", number: 26, position: "Защитник", goals: 6, assists: 15, image: "https://cdn.poehali.dev/files/82b1f898-0098-40f9-9b37-bfc3250ec9a4.png" },
+    { id: 7, name: "Bobrovskiy", number: 88, position: "Нападающий", goals: 20, assists: 12, image: "https://cdn.poehali.dev/files/82b1f898-0098-40f9-9b37-bfc3250ec9a4.png" },
+    { id: 8, name: "Martyska", number: 16, position: "Нападающий", goals: 14, assists: 16, image: "https://cdn.poehali.dev/files/82b1f898-0098-40f9-9b37-bfc3250ec9a4.png" },
+    { id: 9, name: "Maksimka", number: 72, position: "Защитник", goals: 5, assists: 19, image: "https://cdn.poehali.dev/files/82b1f898-0098-40f9-9b37-bfc3250ec9a4.png" },
+    { id: 10, name: "Mishurov", number: 1, position: "Вратарь", goals: 0, assists: 1, image: "https://cdn.poehali.dev/files/82b1f898-0098-40f9-9b37-bfc3250ec9a4.png" },
+    { id: 11, name: "Danil", number: 11, position: "Нападающий", goals: 16, assists: 13, image: "https://cdn.poehali.dev/files/82b1f898-0098-40f9-9b37-bfc3250ec9a4.png" }
+  ];
 
   const matches: Array<{id: number; date: string; opponent: string; home: boolean; score: string; status: string}> = [
     { id: 1, date: "16.10", opponent: "Академия Михайлова", home: true, score: "-:-", status: "Скоро" },
@@ -74,15 +86,20 @@ const Index = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {players.map((player) => (
                 <Card key={player.id} className="overflow-hidden group hover:shadow-xl transition-all">
-                  <div className="relative h-64 overflow-hidden">
+                  <div className="relative h-64 overflow-hidden bg-gradient-to-b from-primary/20 to-primary/5">
                     <img 
                       src={player.image} 
                       alt={player.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-300"
                     />
-                    <div className="absolute top-4 right-4 bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center font-oswald text-xl font-bold">
+                    <div className="absolute top-4 right-4 bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center font-oswald text-xl font-bold shadow-lg">
                       {player.number}
                     </div>
+                    {player.isCaptain && (
+                      <div className="absolute top-4 left-4 bg-accent text-white px-3 py-1 rounded-full font-oswald text-sm font-bold shadow-lg">
+                        C
+                      </div>
+                    )}
                   </div>
                   <CardContent className="p-4">
                     <h3 className="font-oswald text-xl mb-2">{player.name}</h3>
