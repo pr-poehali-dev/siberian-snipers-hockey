@@ -215,8 +215,25 @@ const Index = () => {
             </div>
             <div className="text-center md:text-right">
               <h4 className="font-oswald text-lg mb-4">КОНТАКТЫ</h4>
-              <div className="space-y-2 text-white/80">
-                <p>Добавьте контактные данные клуба</p>
+              <div className="space-y-3 text-white/80">
+                <a 
+                  href="https://t.me/DeiverEditor" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center md:justify-end gap-2 hover:text-white transition-colors"
+                >
+                  <Icon name="Send" size={18} />
+                  <span>Связь с владельцем</span>
+                </a>
+                <a 
+                  href="https://yandex.ru/maps/org/ledovy_dvorets_sporta_sibir/97679228834/?ll=82.943296%2C55.071828&z=13" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center md:justify-end gap-2 hover:text-white transition-colors"
+                >
+                  <Icon name="MapPin" size={18} />
+                  <span>Арена: ЛДС СИБИРЬ (временно)</span>
+                </a>
               </div>
             </div>
           </div>
