@@ -45,10 +45,10 @@ const Index = () => {
 
         <Tabs defaultValue="players" className="w-full">
           <TabsList className="w-full grid grid-cols-4 mb-8 h-auto">
-            <TabsTrigger value="players" className="font-oswald text-lg py-4 px-6">ИГРОКИ</TabsTrigger>
-            <TabsTrigger value="matches" className="font-oswald text-lg py-4 px-6">МАТЧИ</TabsTrigger>
-            <TabsTrigger value="standings" className="font-oswald text-lg py-4 px-6 whitespace-normal">ТУРНИРНАЯ ТАБЛИЦА</TabsTrigger>
-            <TabsTrigger value="management" className="font-oswald text-lg py-4 px-6">РУКОВОДСТВО</TabsTrigger>
+            <TabsTrigger value="players" className="font-oswald text-sm py-4 px-4">ИГРОКИ</TabsTrigger>
+            <TabsTrigger value="matches" className="font-oswald text-sm py-4 px-4">МАТЧИ</TabsTrigger>
+            <TabsTrigger value="standings" className="font-oswald text-sm py-4 px-4 whitespace-normal">ТУРНИРНАЯ ТАБЛИЦА</TabsTrigger>
+            <TabsTrigger value="management" className="font-oswald text-sm py-4 px-4">РУКОВОДСТВО</TabsTrigger>
           </TabsList>
 
           <TabsContent value="players" className="space-y-6 min-h-[400px]">
