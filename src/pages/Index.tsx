@@ -77,9 +77,9 @@ const Index = () => {
       >
         <div className="text-center space-y-6 animate-fade-in">
           <img 
-            src="https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/58887bcc-7fc4-4f14-96d5-07dd4c764e38.jpg" 
-            alt="Логотип" 
-            className="w-32 h-32 mx-auto mb-6 object-contain"
+            src="https://cdn.poehali.dev/files/6bfdb2cd-0919-40fa-bc61-3c2a3593736e.jpg" 
+            alt="Логотип Сибирские Снайперы" 
+            className="w-48 h-48 mx-auto mb-6 object-contain"
           />
           <h1 className="text-7xl font-oswald font-bold tracking-wider">СИБИРСКИЕ СНАЙПЕРЫ</h1>
           <p className="text-2xl font-roboto tracking-wide">ХОККЕЙНЫЙ КЛУБ</p>
