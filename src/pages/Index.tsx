@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -6,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Icon from "@/components/ui/icon";
 
 const Index = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = React.useState("players");
 
   const players: Array<{id: number; name: string; number: number; position: string; goals: number; assists: number; image: string}> = [];
@@ -37,7 +39,11 @@ const Index = () => {
           <h1 className="text-7xl font-oswald font-bold tracking-wider">СИБИРСКИЕ СНАЙПЕРЫ</h1>
           <p className="text-2xl font-roboto tracking-wide">ХОККЕЙНЫЙ КЛУБ</p>
           <div className="flex gap-4 justify-center mt-8">
-            <Button size="lg" className="bg-accent hover:bg-accent/90 text-white font-oswald text-lg px-8">
+            <Button 
+              size="lg" 
+              className="bg-accent hover:bg-accent/90 text-white font-oswald text-lg px-8"
+              onClick={() => navigate("/tickets")}
+            >
               КУПИТЬ БИЛЕТЫ
             </Button>
             <Button 
