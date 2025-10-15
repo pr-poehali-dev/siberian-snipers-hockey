@@ -7,7 +7,11 @@ import Icon from "@/components/ui/icon";
 const Index = () => {
   const players: Array<{id: number; name: string; number: number; position: string; goals: number; assists: number; image: string}> = [];
 
-  const matches: Array<{id: number; date: string; opponent: string; home: boolean; score: string; status: string}> = [];
+  const matches: Array<{id: number; date: string; opponent: string; home: boolean; score: string; status: string}> = [
+    { id: 1, date: "16.10", opponent: "Академия Михайлова", home: true, score: "-:-", status: "Скоро" },
+    { id: 2, date: "17.10", opponent: "Динамо Шинник", home: true, score: "-:-", status: "Скоро" },
+    { id: 3, date: "19.10", opponent: "Магнитка", home: false, score: "-:-", status: "Скоро" }
+  ];
 
   const standings: Array<{place: number; team: string; games: number; wins: number; losses: number; points: number}> = [];
 
