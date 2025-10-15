@@ -33,6 +33,12 @@ const Index = () => {
     { id: 3, date: "19.10", opponent: "Магнитка", home: false, score: "-:-", status: "Скоро" }
   ];
 
+  const news: Array<{id: number; title: string; date: string; image: string; excerpt: string}> = [
+    { id: 1, title: "Сибирские Снайперы готовятся к новому сезону", date: "15.10.2025", image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/d96e463a-f0e4-40e5-8913-6f07d929e5ba.jpg", excerpt: "Команда провела интенсивные тренировки перед стартом сезона" },
+    { id: 2, title: "Новые игроки в составе команды", date: "14.10.2025", image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/d96e463a-f0e4-40e5-8913-6f07d929e5ba.jpg", excerpt: "Руководство клуба объявило о подписании контрактов с новыми хоккеистами" },
+    { id: 3, title: "Билеты на первый матч уже в продаже", date: "13.10.2025", image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/d96e463a-f0e4-40e5-8913-6f07d929e5ba.jpg", excerpt: "Не упустите возможность поддержать команду на домашней арене" }
+  ];
+
   const standings: Array<{place: number; team: string; games: number; wins: number; losses: number; points: number}> = [];
 
   const management: Array<{name: string; position: string; experience: string}> = [];
@@ -77,10 +83,11 @@ const Index = () => {
 
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="w-full grid grid-cols-4 mb-8 h-auto">
+          <TabsList className="w-full grid grid-cols-5 mb-8 h-auto">
             <TabsTrigger value="players" className="font-oswald text-sm py-4 px-4">ИГРОКИ</TabsTrigger>
             <TabsTrigger value="matches" className="font-oswald text-sm py-4 px-4">МАТЧИ</TabsTrigger>
-            <TabsTrigger value="standings" className="font-oswald text-sm py-4 px-4 whitespace-normal">ТУРНИРНАЯ ТАБЛИЦА</TabsTrigger>
+            <TabsTrigger value="news" className="font-oswald text-sm py-4 px-4">НОВОСТИ</TabsTrigger>
+            <TabsTrigger value="standings" className="font-oswald text-sm py-4 px-4 whitespace-normal">ТАБЛИЦА</TabsTrigger>
             <TabsTrigger value="management" className="font-oswald text-sm py-4 px-4">РУКОВОДСТВО</TabsTrigger>
           </TabsList>
 
@@ -179,12 +186,12 @@ const Index = () => {
               {matches.map((match) => (
                 <Card key={match.id} className="hover:shadow-lg transition-shadow">
                   <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-6">
+                    <div className="flex items-center justify-between flex-wrap gap-4">
+                      <div className="flex items-center gap-6 flex-wrap">
                         <div className="text-center min-w-[100px]">
                           <p className="font-oswald text-sm text-muted-foreground">{match.date}</p>
                         </div>
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-4 flex-wrap">
                           <span className="font-oswald text-xl">Сибирские Снайперы</span>
                           <Icon name="Swords" size={20} className="text-accent" />
                           <span className="font-oswald text-xl">{match.opponent}</span>
@@ -193,7 +200,7 @@ const Index = () => {
                           {match.home ? "Дома" : "В гостях"}
                         </Badge>
                       </div>
-                      <div className="flex items-center gap-6">
+                      <div className="flex items-center gap-4">
                         <span className="font-oswald text-3xl font-bold">{match.score}</span>
                         <Badge 
                           variant={match.status === "Победа" ? "default" : match.status === "Ничья" ? "secondary" : "outline"}
@@ -201,6 +208,15 @@ const Index = () => {
                         >
                           {match.status}
                         </Badge>
+                        {match.home && (
+                          <Button 
+                            onClick={() => navigate("/tickets")}
+                            className="font-oswald"
+                          >
+                            <Icon name="Ticket" size={18} className="mr-2" />
+                            КУПИТЬ БИЛЕТ
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </CardContent>
@@ -211,6 +227,44 @@ const Index = () => {
               <div className="text-center py-16 text-muted-foreground">
                 <Icon name="Calendar" size={64} className="mx-auto mb-4 opacity-30" />
                 <p className="text-xl font-oswald">СКОРО ЗДЕСЬ ПОЯВЯТСЯ МАТЧИ</p>
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="news" className="space-y-6 min-h-[400px]">
+            <h2 className="text-4xl font-oswald mb-8">НОВОСТИ КЛУБА</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {news.map((article) => (
+                <Card key={article.id} className="overflow-hidden hover:shadow-xl transition-all group">
+                  <div className="relative h-48 overflow-hidden">
+                    <img 
+                      src={article.image} 
+                      alt={article.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    />
+                    <div className="absolute top-4 right-4">
+                      <Badge className="bg-white/90 text-primary hover:bg-white">
+                        {article.date}
+                      </Badge>
+                    </div>
+                  </div>
+                  <CardContent className="p-6">
+                    <h3 className="font-oswald text-xl mb-3 line-clamp-2">{article.title}</h3>
+                    <p className="text-muted-foreground font-roboto text-sm line-clamp-3">
+                      {article.excerpt}
+                    </p>
+                    <Button variant="link" className="mt-4 p-0 font-oswald text-accent">
+                      ЧИТАТЬ ДАЛЕЕ
+                      <Icon name="ArrowRight" size={16} className="ml-2" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            {news.length === 0 && (
+              <div className="text-center py-16 text-muted-foreground">
+                <Icon name="Newspaper" size={64} className="mx-auto mb-4 opacity-30" />
+                <p className="text-xl font-oswald">СКОРО ЗДЕСЬ ПОЯВЯТСЯ НОВОСТИ</p>
               </div>
             )}
           </TabsContent>

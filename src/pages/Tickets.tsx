@@ -286,8 +286,9 @@ const Tickets = () => {
                           className="flex items-center justify-between p-3 bg-muted rounded-lg"
                         >
                           <div className="font-roboto text-sm">
-                            <div className="font-semibold">Ряд {seat.row}, Место {seat.seat}</div>
-                            <div className="text-muted-foreground">Сектор {seat.sector}</div>
+                            <div className="font-semibold">Билет на матч</div>
+                            <div className="text-muted-foreground text-xs">Сибирские Снайперы - Академия Михайлова</div>
+                            <div className="text-xs mt-1">Ряд {seat.row}, Место {seat.seat}, Сектор {seat.sector}</div>
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="font-oswald">{seat.price} ₽</span>
