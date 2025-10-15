@@ -208,42 +208,9 @@ const Index = () => {
 
       <footer className="bg-primary text-white py-12 mt-16">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div>
-              <h3 className="font-oswald text-2xl mb-4">СИБИРСКИЕ СНАЙПЕРЫ</h3>
-              <p className="text-white/80">Профессиональный хоккейный клуб</p>
-            </div>
-            <div>
-              <h4 className="font-oswald text-lg mb-4">КОНТАКТЫ</h4>
-              <div className="space-y-2 text-white/80">
-                <p className="flex items-center gap-2">
-                  <Icon name="MapPin" size={16} />
-                  г. Новосибирск, ул. Спортивная, 1
-                </p>
-                <p className="flex items-center gap-2">
-                  <Icon name="Phone" size={16} />
-                  +7 (383) 000-00-00
-                </p>
-                <p className="flex items-center gap-2">
-                  <Icon name="Mail" size={16} />
-                  info@snipers-hockey.ru
-                </p>
-              </div>
-            </div>
-            <div>
-              <h4 className="font-oswald text-lg mb-4">СОЦИАЛЬНЫЕ СЕТИ</h4>
-              <div className="flex gap-4">
-                <Button size="icon" variant="ghost" className="text-white hover:bg-white/10">
-                  <Icon name="Instagram" size={20} />
-                </Button>
-                <Button size="icon" variant="ghost" className="text-white hover:bg-white/10">
-                  <Icon name="Facebook" size={20} />
-                </Button>
-                <Button size="icon" variant="ghost" className="text-white hover:bg-white/10">
-                  <Icon name="Youtube" size={20} />
-                </Button>
-              </div>
-            </div>
+          <div className="text-center">
+            <h3 className="font-oswald text-2xl mb-4">СИБИРСКИЕ СНАЙПЕРЫ</h3>
+            <p className="text-white/80">Профессиональный хоккейный клуб</p>
           </div>
           <div className="border-t border-white/20 mt-8 pt-8 text-center text-white/60">
             <p>© 2025 Сибирские Снайперы. Все права защищены.</p>
