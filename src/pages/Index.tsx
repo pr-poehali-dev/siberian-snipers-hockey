@@ -4,12 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
 import Icon from "@/components/ui/icon";
 
 const Index = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = React.useState("players");
   const [positionFilter, setPositionFilter] = React.useState("all");
+  const [searchQuery, setSearchQuery] = React.useState("");
 
   const players: Array<{id: number; name: string; number: number; position: string; goals: number; assists: number; image: string; isCaptain?: boolean}> = [
     { id: 1, name: "KRASOTKIN", number: 33, position: "Универсальный", goals: 0, assists: 0, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/01cb72fd-059f-42fa-a829-f343c951ff95.jpg", isCaptain: true },
@@ -83,34 +85,53 @@ const Index = () => {
           </TabsList>
 
           <TabsContent value="players" className="space-y-6 min-h-[400px]">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-              <h2 className="text-4xl font-oswald">СОСТАВ КОМАНДЫ</h2>
-              <div className="flex gap-2 flex-wrap">
-                <Button 
-                  variant={positionFilter === "all" ? "default" : "outline"}
-                  onClick={() => setPositionFilter("all")}
-                  className="font-oswald"
-                >
-                  ВСЕ
-                </Button>
-                <Button 
-                  variant={positionFilter === "Универсальный" ? "default" : "outline"}
-                  onClick={() => setPositionFilter("Универсальный")}
-                  className="font-oswald"
-                >
-                  УНИВЕРСАЛЬНЫЕ
-                </Button>
-                <Button 
-                  variant={positionFilter === "Вратарь" ? "default" : "outline"}
-                  onClick={() => setPositionFilter("Вратарь")}
-                  className="font-oswald"
-                >
-                  ВРАТАРИ
-                </Button>
+            <div className="flex flex-col gap-4 mb-8">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <h2 className="text-4xl font-oswald">СОСТАВ КОМАНДЫ</h2>
+                <div className="flex gap-2 flex-wrap">
+                  <Button 
+                    variant={positionFilter === "all" ? "default" : "outline"}
+                    onClick={() => setPositionFilter("all")}
+                    className="font-oswald"
+                  >
+                    ВСЕ
+                  </Button>
+                  <Button 
+                    variant={positionFilter === "Универсальный" ? "default" : "outline"}
+                    onClick={() => setPositionFilter("Универсальный")}
+                    className="font-oswald"
+                  >
+                    УНИВЕРСАЛЬНЫЕ
+                  </Button>
+                  <Button 
+                    variant={positionFilter === "Вратарь" ? "default" : "outline"}
+                    onClick={() => setPositionFilter("Вратарь")}
+                    className="font-oswald"
+                  >
+                    ВРАТАРИ
+                  </Button>
+                </div>
+              </div>
+              <div className="relative max-w-md">
+                <Icon name="Search" className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
+                <Input
+                  type="text"
+                  placeholder="Поиск по имени или номеру..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 font-roboto"
+                />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {players.filter(player => positionFilter === "all" || player.position === positionFilter).map((player) => (
+              {players
+                .filter(player => positionFilter === "all" || player.position === positionFilter)
+                .filter(player => {
+                  const query = searchQuery.toLowerCase();
+                  return player.name.toLowerCase().includes(query) || 
+                         player.number.toString().includes(query);
+                })
+                .map((player) => (
                 <Card key={player.id} className="overflow-hidden group hover:shadow-xl transition-all">
                   <div className="relative h-64 overflow-hidden bg-gradient-to-b from-primary/20 to-primary/5">
                     <img 
