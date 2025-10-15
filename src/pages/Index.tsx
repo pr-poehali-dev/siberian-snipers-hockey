@@ -51,7 +51,7 @@ const Index = () => {
             <TabsTrigger value="management" className="font-oswald text-lg">РУКОВОДСТВО</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="players" className="space-y-6">
+          <TabsContent value="players" className="space-y-6 min-h-[400px]">
             <h2 className="text-4xl font-oswald mb-8">СОСТАВ КОМАНДЫ</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {players.map((player) => (
@@ -83,9 +83,15 @@ const Index = () => {
                 </Card>
               ))}
             </div>
+            {players.length === 0 && (
+              <div className="text-center py-16 text-muted-foreground">
+                <Icon name="Users" size={64} className="mx-auto mb-4 opacity-30" />
+                <p className="text-xl font-oswald">СКОРО ЗДЕСЬ ПОЯВЯТСЯ ИГРОКИ</p>
+              </div>
+            )}
           </TabsContent>
 
-          <TabsContent value="matches" className="space-y-6">
+          <TabsContent value="matches" className="space-y-6 min-h-[400px]">
             <h2 className="text-4xl font-oswald mb-8">РАСПИСАНИЕ МАТЧЕЙ</h2>
             <div className="space-y-4">
               {matches.map((match) => (
@@ -119,9 +125,15 @@ const Index = () => {
                 </Card>
               ))}
             </div>
+            {matches.length === 0 && (
+              <div className="text-center py-16 text-muted-foreground">
+                <Icon name="Calendar" size={64} className="mx-auto mb-4 opacity-30" />
+                <p className="text-xl font-oswald">СКОРО ЗДЕСЬ ПОЯВЯТСЯ МАТЧИ</p>
+              </div>
+            )}
           </TabsContent>
 
-          <TabsContent value="standings" className="space-y-6">
+          <TabsContent value="standings" className="space-y-6 min-h-[400px]">
             <h2 className="text-4xl font-oswald mb-8">ВОСТОЧНАЯ ЛИГА</h2>
             <Card>
               <CardContent className="p-0">
@@ -156,9 +168,15 @@ const Index = () => {
                 </div>
               </CardContent>
             </Card>
+            {standings.length === 0 && (
+              <div className="text-center py-16 text-muted-foreground">
+                <Icon name="Trophy" size={64} className="mx-auto mb-4 opacity-30" />
+                <p className="text-xl font-oswald">СКОРО ЗДЕСЬ ПОЯВИТСЯ ТУРНИРНАЯ ТАБЛИЦА</p>
+              </div>
+            )}
           </TabsContent>
 
-          <TabsContent value="management" className="space-y-6">
+          <TabsContent value="management" className="space-y-6 min-h-[400px]">
             <h2 className="text-4xl font-oswald mb-8">РУКОВОДСТВО КЛУБА</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {management.map((person, index) => (
@@ -178,6 +196,12 @@ const Index = () => {
                 </Card>
               ))}
             </div>
+            {management.length === 0 && (
+              <div className="text-center py-16 text-muted-foreground">
+                <Icon name="UserCog" size={64} className="mx-auto mb-4 opacity-30" />
+                <p className="text-xl font-oswald">СКОРО ЗДЕСЬ ПОЯВИТСЯ РУКОВОДСТВО</p>
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </div>
