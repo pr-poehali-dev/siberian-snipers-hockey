@@ -222,8 +222,8 @@ const Index = () => {
                   rel="noopener noreferrer"
                   className="flex items-center justify-center md:justify-end gap-2 hover:text-white transition-colors"
                 >
-                  <Icon name="Send" size={18} />
                   <span>Связь с владельцем</span>
+                  <Icon name="Send" size={18} />
                 </a>
                 <a 
                   href="https://yandex.ru/maps/org/ledovy_dvorets_sporta_sibir/97679228834/?ll=82.943296%2C55.071828&z=13" 
@@ -231,8 +231,8 @@ const Index = () => {
                   rel="noopener noreferrer"
                   className="flex items-center justify-center md:justify-end gap-2 hover:text-white transition-colors"
                 >
-                  <Icon name="MapPin" size={18} />
                   <span>Арена: ЛДС СИБИРЬ (временно)</span>
+                  <Icon name="MapPin" size={18} />
                 </a>
               </div>
             </div>
