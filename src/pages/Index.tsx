@@ -5,67 +5,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Icon from "@/components/ui/icon";
 
 const Index = () => {
-  const players = [
-    {
-      id: 1,
-      name: "Алексей Морозов",
-      number: 17,
-      position: "Нападающий",
-      goals: 23,
-      assists: 31,
-      image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/b8cd6fd3-4f45-465a-8ea9-d6ce50ab6c53.jpg"
-    },
-    {
-      id: 2,
-      name: "Дмитрий Волков",
-      number: 27,
-      position: "Защитник",
-      goals: 8,
-      assists: 19,
-      image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/b8cd6fd3-4f45-465a-8ea9-d6ce50ab6c53.jpg"
-    },
-    {
-      id: 3,
-      name: "Иван Соколов",
-      number: 1,
-      position: "Вратарь",
-      goals: 0,
-      assists: 2,
-      image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/b8cd6fd3-4f45-465a-8ea9-d6ce50ab6c53.jpg"
-    },
-    {
-      id: 4,
-      name: "Сергей Кузнецов",
-      number: 91,
-      position: "Нападающий",
-      goals: 19,
-      assists: 24,
-      image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/b8cd6fd3-4f45-465a-8ea9-d6ce50ab6c53.jpg"
-    }
-  ];
+  const players: Array<{id: number; name: string; number: number; position: string; goals: number; assists: number; image: string}> = [];
 
-  const matches = [
-    { id: 1, date: "15.10.2025", opponent: "Тайфун", home: true, score: "5:3", status: "Победа" },
-    { id: 2, date: "18.10.2025", opponent: "Медведи", home: false, score: "2:2", status: "Ничья" },
-    { id: 3, date: "22.10.2025", opponent: "Барсы", home: true, score: "4:2", status: "Победа" },
-    { id: 4, date: "25.10.2025", opponent: "Ястребы", home: false, score: "—", status: "Предстоит" },
-    { id: 5, date: "29.10.2025", opponent: "Волки", home: true, score: "—", status: "Предстоит" }
-  ];
+  const matches: Array<{id: number; date: string; opponent: string; home: boolean; score: string; status: string}> = [];
 
-  const standings = [
-    { place: 1, team: "Сибирские Снайперы", games: 24, wins: 18, losses: 6, points: 54 },
-    { place: 2, team: "Тайфун", games: 24, wins: 16, losses: 8, points: 48 },
-    { place: 3, team: "Барсы", games: 24, wins: 15, losses: 9, points: 45 },
-    { place: 4, team: "Медведи", games: 24, wins: 14, losses: 10, points: 42 },
-    { place: 5, team: "Волки", games: 24, wins: 12, losses: 12, points: 36 }
-  ];
+  const standings: Array<{place: number; team: string; games: number; wins: number; losses: number; points: number}> = [];
 
-  const management = [
-    { name: "Виктор Петров", position: "Главный тренер", experience: "15 лет" },
-    { name: "Андрей Смирнов", position: "Ассистент тренера", experience: "8 лет" },
-    { name: "Олег Иванов", position: "Тренер вратарей", experience: "12 лет" },
-    { name: "Николай Федоров", position: "Генеральный менеджер", experience: "20 лет" }
-  ];
+  const management: Array<{name: string; position: string; experience: string}> = [];
 
   return (
     <div className="min-h-screen bg-background">
