@@ -1,3 +1,4 @@
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -5,6 +6,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Icon from "@/components/ui/icon";
 
 const Index = () => {
+  const [activeTab, setActiveTab] = React.useState("players");
+
   const players: Array<{id: number; name: string; number: number; position: string; goals: number; assists: number; image: string}> = [];
 
   const matches: Array<{id: number; date: string; opponent: string; home: boolean; score: string; status: string}> = [
@@ -37,7 +40,12 @@ const Index = () => {
             <Button size="lg" className="bg-accent hover:bg-accent/90 text-white font-oswald text-lg px-8">
               КУПИТЬ БИЛЕТЫ
             </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 font-oswald text-lg px-8">
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="border-white text-white hover:bg-white/10 font-oswald text-lg px-8"
+              onClick={() => setActiveTab("matches")}
+            >
               КАЛЕНДАРЬ МАТЧЕЙ
             </Button>
           </div>
@@ -47,7 +55,7 @@ const Index = () => {
       <div className="container mx-auto px-4 py-16">
 
 
-        <Tabs defaultValue="players" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="w-full grid grid-cols-4 mb-8 h-auto">
             <TabsTrigger value="players" className="font-oswald text-sm py-4 px-4">ИГРОКИ</TabsTrigger>
             <TabsTrigger value="matches" className="font-oswald text-sm py-4 px-4">МАТЧИ</TabsTrigger>
