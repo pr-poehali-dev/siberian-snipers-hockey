@@ -7,6 +7,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from "@/components/ui/input";
 import Icon from "@/components/ui/icon";
 
+const API_URL = "https://functions.poehali.dev/90140830-0c8d-4493-bfe2-be85f46b2961";
+
+const getUserId = () => {
+  let userId = localStorage.getItem("user_id");
+  if (!userId) {
+    userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    localStorage.setItem("user_id", userId);
+  }
+  return userId;
+};
+
 interface Seat {
   row: number;
   seat: number;
@@ -94,20 +105,47 @@ const Tickets = () => {
     }
   };
 
-  const handlePurchase = () => {
+  const handlePurchase = async () => {
     setIsProcessing(true);
     
-    setTimeout(() => {
+    try {
+      const userId = getUserId();
+      const purchaseData = {
+        amount: totalPrice,
+        type: 'ticket',
+        items: selectedSeats.map(seat => ({
+          row: seat.row,
+          seat: seat.seat,
+          sector: seat.sector,
+          price: seat.price
+        }))
+      };
+
+      const response = await fetch(`${API_URL}?path=purchase`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-User-Id': userId
+        },
+        body: JSON.stringify(purchaseData)
+      });
+
+      if (response.ok) {
+        setIsProcessing(false);
+        setIsPurchased(true);
+        
+        setTimeout(() => {
+          setIsDialogOpen(false);
+          setIsPurchased(false);
+          setSelectedSeats([]);
+          setFormData({ firstName: "", lastName: "", cardNumber: "" });
+        }, 2500);
+      }
+    } catch (error) {
+      console.error("Purchase failed:", error);
       setIsProcessing(false);
-      setIsPurchased(true);
-      
-      setTimeout(() => {
-        setIsDialogOpen(false);
-        setIsPurchased(false);
-        setSelectedSeats([]);
-        setFormData({ firstName: "", lastName: "", cardNumber: "" });
-      }, 2500);
-    }, 2000);
+      alert("Ошибка при покупке билетов");
+    }
   };
 
   const isFormValid = formData.firstName && formData.lastName && formData.cardNumber.length >= 13;

@@ -10,6 +10,17 @@ import ProductDialog from "@/components/shop/ProductDialog";
 import CartDialog from "@/components/shop/CartDialog";
 import CheckoutDialog from "@/components/shop/CheckoutDialog";
 
+const API_URL = "https://functions.poehali.dev/90140830-0c8d-4493-bfe2-be85f46b2961";
+
+const getUserId = () => {
+  let userId = localStorage.getItem("user_id");
+  if (!userId) {
+    userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    localStorage.setItem("user_id", userId);
+  }
+  return userId;
+};
+
 const Shop = () => {
   const navigate = useNavigate();
   const [cart, setCart] = React.useState<CartItem[]>([]);
@@ -85,20 +96,14 @@ const Shop = () => {
     }
   };
 
-  const handlePurchase = () => {
+  const handlePurchase = async () => {
     setIsProcessing(true);
     
-    setTimeout(() => {
-      const currentBalance = parseInt(localStorage.getItem("club_balance") || "0");
-      const newBalance = currentBalance + cartTotal;
-      localStorage.setItem("club_balance", newBalance.toString());
-
-      const purchases = JSON.parse(localStorage.getItem("club_purchases") || "[]");
-      const newPurchase = {
-        id: Date.now().toString(),
-        date: new Date().toLocaleString("ru-RU"),
-        customer: `${formData.firstName} ${formData.lastName}`,
-        total: cartTotal,
+    try {
+      const userId = getUserId();
+      const purchaseData = {
+        amount: cartTotal,
+        type: 'product',
         items: cart.map(item => ({
           name: item.customName && item.customNumber 
             ? `${item.name} (${item.customName} #${item.customNumber})`
@@ -107,26 +112,40 @@ const Shop = () => {
           quantity: item.quantity
         }))
       };
-      localStorage.setItem("club_purchases", JSON.stringify([newPurchase, ...purchases]));
 
+      const response = await fetch(`${API_URL}?path=purchase`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-User-Id': userId
+        },
+        body: JSON.stringify(purchaseData)
+      });
+
+      if (response.ok) {
+        setIsProcessing(false);
+        setIsPurchased(true);
+        
+        setTimeout(() => {
+          setIsCheckoutOpen(false);
+          setIsCartOpen(false);
+          setIsPurchased(false);
+          setCart([]);
+          setFormData({
+            firstName: "",
+            lastName: "",
+            email: "",
+            phone: "",
+            address: "",
+            cardNumber: ""
+          });
+        }, 2500);
+      }
+    } catch (error) {
+      console.error("Purchase failed:", error);
       setIsProcessing(false);
-      setIsPurchased(true);
-      
-      setTimeout(() => {
-        setIsCheckoutOpen(false);
-        setIsCartOpen(false);
-        setIsPurchased(false);
-        setCart([]);
-        setFormData({
-          firstName: "",
-          lastName: "",
-          email: "",
-          phone: "",
-          address: "",
-          cardNumber: ""
-        });
-      }, 2500);
-    }, 2000);
+      alert("Ошибка при покупке");
+    }
   };
 
   const isFormValid = 

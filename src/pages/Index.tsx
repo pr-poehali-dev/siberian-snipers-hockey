@@ -7,45 +7,72 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import Icon from "@/components/ui/icon";
 
+const API_URL = "https://functions.poehali.dev/90140830-0c8d-4493-bfe2-be85f46b2961";
+
+interface Player {
+  id: number;
+  name: string;
+  number: number;
+  position: string;
+  goals: number;
+  assists: number;
+  image: string;
+  is_captain?: boolean;
+  is_assistant?: boolean;
+}
+
+interface Match {
+  id: number;
+  date: string;
+  opponent: string;
+  is_home: boolean;
+  score: string;
+  status: string;
+}
+
+interface NewsItem {
+  id: number;
+  title: string;
+  date: string;
+  image: string;
+  excerpt: string;
+}
+
 const Index = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = React.useState("players");
   const [positionFilter, setPositionFilter] = React.useState("all");
   const [searchQuery, setSearchQuery] = React.useState("");
+  const [players, setPlayers] = React.useState<Player[]>([]);
+  const [matches, setMatches] = React.useState<Match[]>([]);
+  const [news, setNews] = React.useState<NewsItem[]>([]);
+  const [loading, setLoading] = React.useState(true);
 
-  const players: Array<{id: number; name: string; number: number; position: string; goals: number; assists: number; image: string; isCaptain?: boolean; isAssistant?: boolean}> = [
-    { id: 1, name: "KRASOTKIN", number: 33, position: "Универсальный", goals: 12, assists: 18, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/01cb72fd-059f-42fa-a829-f343c951ff95.jpg", isCaptain: true },
-    { id: 2, name: "Lyzenkov", number: 86, position: "Универсальный", goals: 8, assists: 15, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/d0dc5e7d-fcae-4293-a50d-60cd61778d9a.jpg", isAssistant: true },
-    { id: 3, name: "Zetka", number: 8, position: "Универсальный", goals: 15, assists: 12, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/54b0bb6d-95e0-40b1-9b51-b4510ea9889d.jpg", isAssistant: true },
-    { id: 4, name: "Swafare", number: 91, position: "Универсальный", goals: 10, assists: 14, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/5285a795-21e8-4500-b4ea-3ca0d2e51f68.jpg" },
-    { id: 5, name: "Mylnikov Nonprime", number: 20, position: "Вратарь", goals: 0, assists: 2, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/59f77c68-28c5-4974-a009-6a37500196d4.jpg" },
-    { id: 6, name: "Bardakov", number: 26, position: "Универсальный", goals: 6, assists: 9, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/b44d808e-dcb2-47f8-86ca-38f9234e1d87.jpg" },
-    { id: 7, name: "Bobrovskiy", number: 88, position: "Вратарь", goals: 0, assists: 1, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/c6acb1cf-21bd-44d2-aae0-49739fbf1c9a.jpg" },
-    { id: 8, name: "Martyska", number: 16, position: "Универсальный", goals: 7, assists: 11, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/21adbbc8-83a8-451f-85b8-1bdbc6849ede.jpg" },
-    { id: 9, name: "Maksimka", number: 72, position: "Универсальный", goals: 9, assists: 10, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/9c4d93b4-56cc-4742-a055-9d0fb82ab3e9.jpg" },
-    { id: 10, name: "Mishurov", number: 1, position: "Универсальный", goals: 5, assists: 8, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/099efe08-5f23-401d-b466-9b148166e3b9.jpg" },
-    { id: 11, name: "kenzo", number: 10, position: "Универсальный", goals: 18, assists: 20, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/100e1e18-a675-41af-b1c4-4ee35fefb9fc.jpg", isAssistant: true }
-  ];
+  React.useEffect(() => {
+    loadData();
+  }, []);
 
-  const matches: Array<{id: number; date: string; opponent: string; home: boolean; score: string; status: string}> = [
-    { id: 1, date: "16.10", opponent: "Академия Михайлова", home: true, score: "-:-", status: "Скоро" },
-    { id: 2, date: "17.10", opponent: "Динамо Шинник", home: true, score: "-:-", status: "Скоро" },
-    { id: 3, date: "19.10", opponent: "Магнитка", home: false, score: "-:-", status: "Скоро" }
-  ];
+  const loadData = async () => {
+    try {
+      const [playersRes, matchesRes, newsRes] = await Promise.all([
+        fetch(`${API_URL}?path=players`),
+        fetch(`${API_URL}?path=matches`),
+        fetch(`${API_URL}?path=news`)
+      ]);
 
-  const getNewsList = () => {
-    const storedNews = localStorage.getItem("club_news");
-    if (storedNews) {
-      return JSON.parse(storedNews);
+      const playersData = await playersRes.json();
+      const matchesData = await matchesRes.json();
+      const newsData = await newsRes.json();
+
+      setPlayers(playersData.players || []);
+      setMatches(matchesData.matches || []);
+      setNews(newsData.news || []);
+    } catch (error) {
+      console.error("Failed to load data:", error);
+    } finally {
+      setLoading(false);
     }
-    return [
-      { id: 1, title: "Сибирские Снайперы готовятся к новому сезону", date: "15.10.2025", image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/d96e463a-f0e4-40e5-8913-6f07d929e5ba.jpg", excerpt: "Команда провела интенсивные тренировки перед стартом сезона" },
-      { id: 2, title: "Новые игроки в составе команды", date: "14.10.2025", image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/d96e463a-f0e4-40e5-8913-6f07d929e5ba.jpg", excerpt: "Руководство клуба объявило о подписании контрактов с новыми хоккеистами" },
-      { id: 3, title: "Билеты на первый матч уже в продаже", date: "13.10.2025", image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/d96e463a-f0e4-40e5-8913-6f07d929e5ba.jpg", excerpt: "Не упустите возможность поддержать команду на домашней арене" }
-    ];
   };
-
-  const news = getNewsList();
 
   const standings: Array<{place: number; team: string; games: number; wins: number; losses: number; points: number}> = [];
 
@@ -176,12 +203,12 @@ const Index = () => {
                     <div className="absolute top-4 right-4 bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center font-oswald text-xl font-bold shadow-lg">
                       {player.number}
                     </div>
-                    {player.isCaptain && (
+                    {player.is_captain && (
                       <div className="absolute top-4 left-4 bg-yellow-500 text-black px-3 py-1 rounded-full font-oswald text-sm font-bold shadow-lg">
                         C
                       </div>
                     )}
-                    {player.isAssistant && (
+                    {player.is_assistant && (
                       <div className="absolute top-4 left-4 bg-blue-500 text-white px-3 py-1 rounded-full font-oswald text-sm font-bold shadow-lg">
                         A
                       </div>
@@ -236,8 +263,8 @@ const Index = () => {
                           <Icon name="Swords" size={20} className="text-accent" />
                           <span className="font-oswald text-xl">{match.opponent}</span>
                         </div>
-                        <Badge variant={match.home ? "default" : "outline"}>
-                          {match.home ? "Дома" : "В гостях"}
+                        <Badge variant={match.is_home ? "default" : "outline"}>
+                          {match.is_home ? "Дома" : "В гостях"}
                         </Badge>
                       </div>
                       <div className="flex items-center gap-4">
@@ -248,7 +275,7 @@ const Index = () => {
                         >
                           {match.status}
                         </Badge>
-                        {match.home && (
+                        {match.is_home && (
                           <Button 
                             onClick={() => navigate("/tickets")}
                             className="font-oswald"

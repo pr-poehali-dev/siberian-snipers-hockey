@@ -5,8 +5,37 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import Icon from "@/components/ui/icon";
 import { Badge } from "@/components/ui/badge";
+import Icon from "@/components/ui/icon";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+
+const API_URL = "https://functions.poehali.dev/90140830-0c8d-4493-bfe2-be85f46b2961";
+
+interface Player {
+  id: number;
+  name: string;
+  number: number;
+  position: string;
+  goals: number;
+  assists: number;
+  games_played: number;
+  image: string;
+  is_captain: boolean;
+  is_assistant: boolean;
+  height?: string;
+  weight?: string;
+  birth_date?: string;
+  nationality?: string;
+}
+
+interface Match {
+  id: number;
+  date: string;
+  opponent: string;
+  is_home: boolean;
+  score: string;
+  status: string;
+}
 
 interface NewsItem {
   id: number;
@@ -14,41 +43,64 @@ interface NewsItem {
   date: string;
   image: string;
   excerpt: string;
-  content: string;
-}
-
-interface Purchase {
-  id: string;
-  date: string;
-  items: Array<{name: string; price: number; quantity: number}>;
-  total: number;
-  customer: string;
+  content?: string;
 }
 
 const Admin = () => {
   const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
   const [password, setPassword] = React.useState("");
-  const [activeSection, setActiveSection] = React.useState("dashboard");
-  
-  const [newNews, setNewNews] = React.useState({
-    title: "",
-    image: "",
-    excerpt: "",
-    content: ""
-  });
+  const [activeSection, setActiveSection] = React.useState("players");
+  const [loading, setLoading] = React.useState(false);
+
+  const [players, setPlayers] = React.useState<Player[]>([]);
+  const [matches, setMatches] = React.useState<Match[]>([]);
+  const [news, setNews] = React.useState<NewsItem[]>([]);
+
+  const [editingPlayer, setEditingPlayer] = React.useState<Player | null>(null);
+  const [editingMatch, setEditingMatch] = React.useState<Match | null>(null);
+  const [editingNews, setEditingNews] = React.useState<NewsItem | null>(null);
+
+  const [isPlayerDialogOpen, setIsPlayerDialogOpen] = React.useState(false);
+  const [isMatchDialogOpen, setIsMatchDialogOpen] = React.useState(false);
+  const [isNewsDialogOpen, setIsNewsDialogOpen] = React.useState(false);
 
   React.useEffect(() => {
     const auth = localStorage.getItem("admin_auth");
     if (auth === "authenticated") {
       setIsAuthenticated(true);
+      loadData();
     }
   }, []);
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const [playersRes, matchesRes, newsRes] = await Promise.all([
+        fetch(`${API_URL}?path=players`),
+        fetch(`${API_URL}?path=matches`),
+        fetch(`${API_URL}?path=news`)
+      ]);
+
+      const playersData = await playersRes.json();
+      const matchesData = await matchesRes.json();
+      const newsData = await newsRes.json();
+
+      setPlayers(playersData.players || []);
+      setMatches(matchesData.matches || []);
+      setNews(newsData.news || []);
+    } catch (error) {
+      console.error("Failed to load data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogin = () => {
     if (password === "HK_SIBIRSKIE_SNAIPERS") {
       setIsAuthenticated(true);
       localStorage.setItem("admin_auth", "authenticated");
+      loadData();
     } else {
       alert("Неверный пароль!");
     }
@@ -60,47 +112,76 @@ const Admin = () => {
     navigate("/");
   };
 
-  const getClubBalance = () => {
-    const balance = localStorage.getItem("club_balance");
-    return balance ? parseInt(balance) : 0;
-  };
+  const handleUpdatePlayer = async () => {
+    if (!editingPlayer) return;
+    
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}?path=players/${editingPlayer.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editingPlayer)
+      });
 
-  const getNewsList = (): NewsItem[] => {
-    const news = localStorage.getItem("club_news");
-    return news ? JSON.parse(news) : [];
-  };
-
-  const getPurchases = (): Purchase[] => {
-    const purchases = localStorage.getItem("club_purchases");
-    return purchases ? JSON.parse(purchases) : [];
-  };
-
-  const handleAddNews = () => {
-    if (!newNews.title || !newNews.excerpt) {
-      alert("Заполните название и краткое описание!");
-      return;
+      if (response.ok) {
+        await loadData();
+        setIsPlayerDialogOpen(false);
+        setEditingPlayer(null);
+      }
+    } catch (error) {
+      console.error("Failed to update player:", error);
+      alert("Ошибка при обновлении игрока");
+    } finally {
+      setLoading(false);
     }
-
-    const currentNews = getNewsList();
-    const newsItem: NewsItem = {
-      id: Date.now(),
-      title: newNews.title,
-      date: new Date().toLocaleDateString("ru-RU"),
-      image: newNews.image || "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/d96e463a-f0e4-40e5-8913-6f07d929e5ba.jpg",
-      excerpt: newNews.excerpt,
-      content: newNews.content
-    };
-
-    localStorage.setItem("club_news", JSON.stringify([newsItem, ...currentNews]));
-    setNewNews({ title: "", image: "", excerpt: "", content: "" });
-    alert("Новость добавлена!");
   };
 
-  const handleDeleteNews = (id: number) => {
-    const currentNews = getNewsList();
-    const filtered = currentNews.filter(n => n.id !== id);
-    localStorage.setItem("club_news", JSON.stringify(filtered));
-    alert("Новость удалена!");
+  const handleUpdateMatch = async () => {
+    if (!editingMatch) return;
+    
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}?path=matches/${editingMatch.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editingMatch)
+      });
+
+      if (response.ok) {
+        await loadData();
+        setIsMatchDialogOpen(false);
+        setEditingMatch(null);
+      }
+    } catch (error) {
+      console.error("Failed to update match:", error);
+      alert("Ошибка при обновлении матча");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateNews = async () => {
+    if (!editingNews) return;
+    
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}?path=news/${editingNews.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.dumps(editingNews)
+      });
+
+      if (response.ok) {
+        await loadData();
+        setIsNewsDialogOpen(false);
+        setEditingNews(null);
+      }
+    } catch (error) {
+      console.error("Failed to update news:", error);
+      alert("Ошибка при обновлении новости");
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!isAuthenticated) {
@@ -149,261 +230,394 @@ const Admin = () => {
     );
   }
 
-  const balance = getClubBalance();
-  const newsList = getNewsList();
-  const purchases = getPurchases();
-
   return (
-    <div className="min-h-screen bg-background relative">
-      <div className="fixed inset-0 pointer-events-none opacity-5 z-0">
-        <img 
-          src="https://cdn.poehali.dev/files/5eafa8e1-7cd4-4959-927d-702849e9a9e9.jpg" 
-          alt="Логотип фон" 
-          className="w-full h-full object-contain"
-        />
-      </div>
-
-      <div className="bg-primary text-white py-8 relative z-10">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-5xl font-oswald font-bold">ПАНЕЛЬ УПРАВЛЕНИЯ</h1>
-              <p className="text-xl font-roboto mt-2">Сибирские Снайперы</p>
-            </div>
-            <Button onClick={handleLogout} variant="outline" className="text-white border-white hover:bg-white/10">
+    <div className="min-h-screen bg-background p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-4xl font-oswald font-bold">АДМИН-ПАНЕЛЬ</h1>
+            <p className="text-muted-foreground">Управление контентом сайта</p>
+          </div>
+          <div className="flex gap-3">
+            <Button onClick={() => navigate("/")} variant="outline">
+              <Icon name="Home" className="mr-2" size={20} />
+              На сайт
+            </Button>
+            <Button onClick={handleLogout} variant="destructive">
               <Icon name="LogOut" className="mr-2" size={20} />
-              ВЫЙТИ
+              Выход
             </Button>
           </div>
         </div>
-      </div>
 
-      <div className="container mx-auto px-4 py-8 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div className="flex gap-3 mb-6">
           <Button
-            variant={activeSection === "dashboard" ? "default" : "outline"}
-            onClick={() => setActiveSection("dashboard")}
-            className="font-oswald h-auto py-4"
+            onClick={() => setActiveSection("players")}
+            variant={activeSection === "players" ? "default" : "outline"}
+            className="font-oswald"
           >
-            <Icon name="LayoutDashboard" className="mr-2" size={20} />
-            ДАШБОРД
+            <Icon name="Users" className="mr-2" size={20} />
+            ИГРОКИ
           </Button>
           <Button
-            variant={activeSection === "news" ? "default" : "outline"}
+            onClick={() => setActiveSection("matches")}
+            variant={activeSection === "matches" ? "default" : "outline"}
+            className="font-oswald"
+          >
+            <Icon name="Calendar" className="mr-2" size={20} />
+            МАТЧИ
+          </Button>
+          <Button
             onClick={() => setActiveSection("news")}
-            className="font-oswald h-auto py-4"
+            variant={activeSection === "news" ? "default" : "outline"}
+            className="font-oswald"
           >
             <Icon name="Newspaper" className="mr-2" size={20} />
             НОВОСТИ
           </Button>
-          <Button
-            variant={activeSection === "purchases" ? "default" : "outline"}
-            onClick={() => setActiveSection("purchases")}
-            className="font-oswald h-auto py-4"
-          >
-            <Icon name="ShoppingCart" className="mr-2" size={20} />
-            ПОКУПКИ
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => navigate("/")}
-            className="font-oswald h-auto py-4"
-          >
-            <Icon name="Home" className="mr-2" size={20} />
-            НА САЙТ
-          </Button>
         </div>
 
-        {activeSection === "dashboard" && (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card className="bg-gradient-to-br from-green-500 to-green-700 text-white">
-                <CardHeader>
-                  <CardTitle className="text-lg font-oswald flex items-center">
-                    <Icon name="Wallet" className="mr-2" size={24} />
-                    БАЛАНС КЛУБА
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-5xl font-bold font-oswald">{balance.toLocaleString()} ₽</p>
-                  <p className="text-sm mt-2 opacity-90">Общий доход от продаж</p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-blue-500 to-blue-700 text-white">
-                <CardHeader>
-                  <CardTitle className="text-lg font-oswald flex items-center">
-                    <Icon name="ShoppingBag" className="mr-2" size={24} />
-                    ПРОДАЖИ
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-5xl font-bold font-oswald">{purchases.length}</p>
-                  <p className="text-sm mt-2 opacity-90">Всего покупок</p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-purple-500 to-purple-700 text-white">
-                <CardHeader>
-                  <CardTitle className="text-lg font-oswald flex items-center">
-                    <Icon name="Newspaper" className="mr-2" size={24} />
-                    НОВОСТИ
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-5xl font-bold font-oswald">{newsList.length}</p>
-                  <p className="text-sm mt-2 opacity-90">Опубликовано</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="font-oswald text-2xl">ПОСЛЕДНИЕ ПОКУПКИ</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {purchases.slice(0, 5).map((purchase) => (
-                  <div key={purchase.id} className="border-b last:border-0 py-4">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="font-oswald text-lg">{purchase.customer}</p>
-                        <p className="text-sm text-muted-foreground">{purchase.date}</p>
-                        <div className="mt-2 space-y-1">
-                          {purchase.items.map((item, idx) => (
-                            <p key={idx} className="text-sm">
-                              {item.name} x{item.quantity}
-                            </p>
-                          ))}
-                        </div>
-                      </div>
-                      <Badge className="text-lg px-4 py-1 bg-green-600">
-                        +{purchase.total.toLocaleString()} ₽
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-                {purchases.length === 0 && (
-                  <p className="text-center text-muted-foreground py-8">Покупок пока нет</p>
-                )}
-              </CardContent>
-            </Card>
+        {loading && (
+          <div className="text-center py-12">
+            <Icon name="Loader" className="animate-spin mx-auto mb-4" size={48} />
+            <p className="text-muted-foreground">Загрузка...</p>
           </div>
         )}
 
-        {activeSection === "news" && (
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="font-oswald text-2xl">ДОБАВИТЬ НОВОСТЬ</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
+        {!loading && activeSection === "players" && (
+          <div className="space-y-4">
+            <h2 className="text-2xl font-oswald font-bold">Управление игроками</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {players.map(player => (
+                <Card key={player.id}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-4 mb-3">
+                      <img src={player.image} alt={player.name} className="w-16 h-16 rounded-full object-cover" />
+                      <div>
+                        <h3 className="font-oswald text-xl">{player.name}</h3>
+                        <Badge variant="secondary">#{player.number}</Badge>
+                      </div>
+                    </div>
+                    <div className="space-y-1 text-sm mb-3">
+                      <p><strong>Позиция:</strong> {player.position}</p>
+                      <p><strong>Голы:</strong> {player.goals} | <strong>Передачи:</strong> {player.assists}</p>
+                      <p><strong>Матчи:</strong> {player.games_played}</p>
+                    </div>
+                    <Button
+                      onClick={() => {
+                        setEditingPlayer(player);
+                        setIsPlayerDialogOpen(true);
+                      }}
+                      className="w-full"
+                      size="sm"
+                    >
+                      <Icon name="Edit" className="mr-2" size={16} />
+                      Редактировать
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {!loading && activeSection === "matches" && (
+          <div className="space-y-4">
+            <h2 className="text-2xl font-oswald font-bold">Управление матчами</h2>
+            <div className="space-y-3">
+              {matches.map(match => (
+                <Card key={match.id}>
+                  <CardContent className="p-4 flex items-center justify-between">
+                    <div>
+                      <h3 className="font-oswald text-lg">{match.date} - {match.opponent}</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {match.is_home ? "Домашний матч" : "Выездной матч"} | Счет: {match.score} | {match.status}
+                      </p>
+                    </div>
+                    <Button
+                      onClick={() => {
+                        setEditingMatch(match);
+                        setIsMatchDialogOpen(true);
+                      }}
+                      size="sm"
+                    >
+                      <Icon name="Edit" className="mr-2" size={16} />
+                      Редактировать
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {!loading && activeSection === "news" && (
+          <div className="space-y-4">
+            <h2 className="text-2xl font-oswald font-bold">Управление новостями</h2>
+            <div className="space-y-3">
+              {news.map(item => (
+                <Card key={item.id}>
+                  <CardContent className="p-4 flex items-center gap-4">
+                    <img src={item.image} alt={item.title} className="w-24 h-24 rounded object-cover" />
+                    <div className="flex-1">
+                      <h3 className="font-oswald text-lg">{item.title}</h3>
+                      <p className="text-sm text-muted-foreground mb-2">{item.date}</p>
+                      <p className="text-sm">{item.excerpt}</p>
+                    </div>
+                    <Button
+                      onClick={() => {
+                        setEditingNews(item);
+                        setIsNewsDialogOpen(true);
+                      }}
+                      size="sm"
+                    >
+                      <Icon name="Edit" className="mr-2" size={16} />
+                      Редактировать
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <Dialog open={isPlayerDialogOpen} onOpenChange={setIsPlayerDialogOpen}>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="font-oswald text-2xl">Редактирование игрока</DialogTitle>
+            </DialogHeader>
+            {editingPlayer && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Имя</Label>
+                    <Input
+                      value={editingPlayer.name}
+                      onChange={(e) => setEditingPlayer({...editingPlayer, name: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label>Номер</Label>
+                    <Input
+                      type="number"
+                      value={editingPlayer.number}
+                      onChange={(e) => setEditingPlayer({...editingPlayer, number: parseInt(e.target.value)})}
+                    />
+                  </div>
+                </div>
                 <div>
-                  <Label>Заголовок *</Label>
+                  <Label>Позиция</Label>
                   <Input
-                    value={newNews.title}
-                    onChange={(e) => setNewNews({...newNews, title: e.target.value})}
-                    placeholder="Введите заголовок новости"
+                    value={editingPlayer.position}
+                    onChange={(e) => setEditingPlayer({...editingPlayer, position: e.target.value})}
+                  />
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <Label>Голы</Label>
+                    <Input
+                      type="number"
+                      value={editingPlayer.goals}
+                      onChange={(e) => setEditingPlayer({...editingPlayer, goals: parseInt(e.target.value)})}
+                    />
+                  </div>
+                  <div>
+                    <Label>Передачи</Label>
+                    <Input
+                      type="number"
+                      value={editingPlayer.assists}
+                      onChange={(e) => setEditingPlayer({...editingPlayer, assists: parseInt(e.target.value)})}
+                    />
+                  </div>
+                  <div>
+                    <Label>Матчи</Label>
+                    <Input
+                      type="number"
+                      value={editingPlayer.games_played}
+                      onChange={(e) => setEditingPlayer({...editingPlayer, games_played: parseInt(e.target.value)})}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Рост</Label>
+                    <Input
+                      value={editingPlayer.height || ""}
+                      onChange={(e) => setEditingPlayer({...editingPlayer, height: e.target.value})}
+                      placeholder="180 см"
+                    />
+                  </div>
+                  <div>
+                    <Label>Вес</Label>
+                    <Input
+                      value={editingPlayer.weight || ""}
+                      onChange={(e) => setEditingPlayer({...editingPlayer, weight: e.target.value})}
+                      placeholder="75 кг"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Дата рождения</Label>
+                    <Input
+                      value={editingPlayer.birth_date || ""}
+                      onChange={(e) => setEditingPlayer({...editingPlayer, birth_date: e.target.value})}
+                      placeholder="01.01.2000"
+                    />
+                  </div>
+                  <div>
+                    <Label>Гражданство</Label>
+                    <Input
+                      value={editingPlayer.nationality || ""}
+                      onChange={(e) => setEditingPlayer({...editingPlayer, nationality: e.target.value})}
+                      placeholder="Россия"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label>URL изображения</Label>
+                  <Input
+                    value={editingPlayer.image}
+                    onChange={(e) => setEditingPlayer({...editingPlayer, image: e.target.value})}
+                  />
+                </div>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={editingPlayer.is_captain}
+                      onChange={(e) => setEditingPlayer({...editingPlayer, is_captain: e.target.checked})}
+                      className="w-4 h-4"
+                    />
+                    <span>Капитан</span>
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={editingPlayer.is_assistant}
+                      onChange={(e) => setEditingPlayer({...editingPlayer, is_assistant: e.target.checked})}
+                      className="w-4 h-4"
+                    />
+                    <span>Ассистент</span>
+                  </label>
+                </div>
+                <Button onClick={handleUpdatePlayer} className="w-full" disabled={loading}>
+                  <Icon name="Save" className="mr-2" size={20} />
+                  Сохранить изменения
+                </Button>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={isMatchDialogOpen} onOpenChange={setIsMatchDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="font-oswald text-2xl">Редактирование матча</DialogTitle>
+            </DialogHeader>
+            {editingMatch && (
+              <div className="space-y-4">
+                <div>
+                  <Label>Дата</Label>
+                  <Input
+                    value={editingMatch.date}
+                    onChange={(e) => setEditingMatch({...editingMatch, date: e.target.value})}
+                    placeholder="16.10"
+                  />
+                </div>
+                <div>
+                  <Label>Соперник</Label>
+                  <Input
+                    value={editingMatch.opponent}
+                    onChange={(e) => setEditingMatch({...editingMatch, opponent: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label>Счет</Label>
+                  <Input
+                    value={editingMatch.score}
+                    onChange={(e) => setEditingMatch({...editingMatch, score: e.target.value})}
+                    placeholder="5:3"
+                  />
+                </div>
+                <div>
+                  <Label>Статус</Label>
+                  <Input
+                    value={editingMatch.status}
+                    onChange={(e) => setEditingMatch({...editingMatch, status: e.target.value})}
+                    placeholder="Скоро / Завершен"
+                  />
+                </div>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={editingMatch.is_home}
+                    onChange={(e) => setEditingMatch({...editingMatch, is_home: e.target.checked})}
+                    className="w-4 h-4"
+                  />
+                  <span>Домашний матч</span>
+                </label>
+                <Button onClick={handleUpdateMatch} className="w-full" disabled={loading}>
+                  <Icon name="Save" className="mr-2" size={20} />
+                  Сохранить изменения
+                </Button>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={isNewsDialogOpen} onOpenChange={setIsNewsDialogOpen}>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="font-oswald text-2xl">Редактирование новости</DialogTitle>
+            </DialogHeader>
+            {editingNews && (
+              <div className="space-y-4">
+                <div>
+                  <Label>Заголовок</Label>
+                  <Input
+                    value={editingNews.title}
+                    onChange={(e) => setEditingNews({...editingNews, title: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label>Дата</Label>
+                  <Input
+                    value={editingNews.date}
+                    onChange={(e) => setEditingNews({...editingNews, date: e.target.value})}
                   />
                 </div>
                 <div>
                   <Label>URL изображения</Label>
                   <Input
-                    value={newNews.image}
-                    onChange={(e) => setNewNews({...newNews, image: e.target.value})}
-                    placeholder="https://..."
+                    value={editingNews.image}
+                    onChange={(e) => setEditingNews({...editingNews, image: e.target.value})}
                   />
                 </div>
                 <div>
-                  <Label>Краткое описание *</Label>
+                  <Label>Краткое описание</Label>
                   <Textarea
-                    value={newNews.excerpt}
-                    onChange={(e) => setNewNews({...newNews, excerpt: e.target.value})}
-                    placeholder="Краткое описание для карточки"
+                    value={editingNews.excerpt}
+                    onChange={(e) => setEditingNews({...editingNews, excerpt: e.target.value})}
                     rows={3}
                   />
                 </div>
                 <div>
-                  <Label>Полный текст</Label>
+                  <Label>Полный текст (опционально)</Label>
                   <Textarea
-                    value={newNews.content}
-                    onChange={(e) => setNewNews({...newNews, content: e.target.value})}
-                    placeholder="Полный текст новости"
+                    value={editingNews.content || ""}
+                    onChange={(e) => setEditingNews({...editingNews, content: e.target.value})}
                     rows={6}
                   />
                 </div>
-                <Button onClick={handleAddNews} className="w-full font-oswald text-lg">
-                  <Icon name="Plus" className="mr-2" size={20} />
-                  ОПУБЛИКОВАТЬ НОВОСТЬ
+                <Button onClick={handleUpdateNews} className="w-full" disabled={loading}>
+                  <Icon name="Save" className="mr-2" size={20} />
+                  Сохранить изменения
                 </Button>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="font-oswald text-2xl">ОПУБЛИКОВАННЫЕ НОВОСТИ</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {newsList.map((news) => (
-                  <div key={news.id} className="border rounded-lg p-4 flex justify-between items-start">
-                    <div className="flex-1">
-                      <h3 className="font-oswald text-xl">{news.title}</h3>
-                      <p className="text-sm text-muted-foreground">{news.date}</p>
-                      <p className="text-sm mt-2">{news.excerpt}</p>
-                    </div>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDeleteNews(news.id)}
-                    >
-                      <Icon name="Trash2" size={16} />
-                    </Button>
-                  </div>
-                ))}
-                {newsList.length === 0 && (
-                  <p className="text-center text-muted-foreground py-8">Новостей пока нет</p>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        {activeSection === "purchases" && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="font-oswald text-2xl">ВСЕ ПОКУПКИ</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {purchases.map((purchase) => (
-                  <div key={purchase.id} className="border rounded-lg p-4">
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <p className="font-oswald text-xl">{purchase.customer}</p>
-                        <p className="text-sm text-muted-foreground">{purchase.date}</p>
-                      </div>
-                      <Badge className="text-xl px-4 py-2 bg-green-600">
-                        {purchase.total.toLocaleString()} ₽
-                      </Badge>
-                    </div>
-                    <div className="mt-4 space-y-2">
-                      {purchase.items.map((item, idx) => (
-                        <div key={idx} className="flex justify-between text-sm border-t pt-2">
-                          <span>{item.name}</span>
-                          <span className="text-muted-foreground">
-                            {item.quantity} x {item.price} ₽ = {item.quantity * item.price} ₽
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-                {purchases.length === 0 && (
-                  <p className="text-center text-muted-foreground py-8">Покупок пока нет</p>
-                )}
               </div>
-            </CardContent>
-          </Card>
-        )}
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

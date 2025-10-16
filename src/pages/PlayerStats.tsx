@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Icon from "@/components/ui/icon";
 
+const API_URL = "https://functions.poehali.dev/90140830-0c8d-4493-bfe2-be85f46b2961";
+
 interface Player {
   id: number;
   name: string;
@@ -13,23 +15,55 @@ interface Player {
   goals: number;
   assists: number;
   image: string;
-  isCaptain?: boolean;
-  isAssistant?: boolean;
-  height: string;
-  weight: string;
-  birthDate: string;
-  nationality: string;
-  gamesPlayed: number;
-  penaltyMinutes: number;
-  plusMinus: number;
-  shots: number;
-  shotPercentage: number;
-  avgTimeOnIce: string;
+  is_captain?: boolean;
+  is_assistant?: boolean;
+  height?: string;
+  weight?: string;
+  birth_date?: string;
+  nationality?: string;
+  games_played: number;
 }
 
 const PlayerStats = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const [player, setPlayer] = React.useState<Player | null>(null);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    loadPlayer();
+  }, [id]);
+
+  const loadPlayer = async () => {
+    try {
+      const response = await fetch(`${API_URL}?path=players/${id}`);
+      const data = await response.json();
+      setPlayer(data.player);
+    } catch (error) {
+      console.error("Failed to load player:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Icon name="Loader" className="animate-spin" size={48} />
+      </div>
+    );
+  }
+
+  if (!player) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-oswald mb-4">Игрок не найден</h2>
+          <Button onClick={() => navigate("/")}>На главную</Button>
+        </div>
+      </div>
+    );
+  }
 
   const players: Player[] = [
     { 
@@ -247,21 +281,6 @@ const PlayerStats = () => {
     }
   ];
 
-  const player = players.find(p => p.id === Number(id));
-
-  if (!player) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-oswald mb-4">Игрок не найден</h2>
-          <Button onClick={() => navigate("/")}>
-            Вернуться на главную
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   const totalPoints = player.goals + player.assists;
 
   return (
@@ -298,12 +317,12 @@ const PlayerStats = () => {
                   className="w-full h-96 object-cover rounded-lg"
                 />
                 <div className="absolute top-4 right-4 flex flex-col gap-2">
-                  {player.isCaptain && (
+                  {player.is_captain && (
                     <Badge className="bg-yellow-500 text-black font-bold text-lg px-3 py-1">
                       C
                     </Badge>
                   )}
-                  {player.isAssistant && (
+                  {player.is_assistant && (
                     <Badge className="bg-blue-500 text-white font-bold text-lg px-3 py-1">
                       A
                     </Badge>
@@ -327,7 +346,7 @@ const PlayerStats = () => {
                 </div>
                 <div className="flex justify-between border-b pb-2">
                   <span className="font-oswald">Дата рождения:</span>
-                  <span className="font-bold">{player.birthDate || '-'}</span>
+                  <span className="font-bold">{player.birth_date || '-'}</span>
                 </div>
                 <div className="flex justify-between border-b pb-2">
                   <span className="font-oswald">Гражданство:</span>
@@ -361,7 +380,7 @@ const PlayerStats = () => {
                   </div>
                   <div className="text-center p-4 bg-green-500/10 rounded-lg">
                     <Icon name="Calendar" className="mx-auto mb-2 text-green-500" size={32} />
-                    <div className="text-4xl font-bold text-green-500">{player.gamesPlayed || '-'}</div>
+                    <div className="text-4xl font-bold text-green-500">{player.games_played || '-'}</div>
                     <div className="text-sm font-oswald text-muted-foreground">МАТЧИ</div>
                   </div>
                 </div>

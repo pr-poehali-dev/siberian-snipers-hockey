@@ -1,0 +1,25 @@
+{
+  "tests": [
+    {
+      "name": "Get all players",
+      "method": "GET",
+      "path": "/?path=players",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Get user budget",
+      "method": "GET",
+      "path": "/?path=budget",
+      "headers": {
+        "X-User-Id": "test-user"
+      },
+      "expectedStatus": 200
+    },
+    {
+      "name": "OPTIONS request for CORS",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    }
+  ]
+}
