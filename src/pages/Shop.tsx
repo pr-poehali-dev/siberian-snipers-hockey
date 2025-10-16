@@ -39,45 +39,44 @@ const Shop = () => {
   const products: Product[] = [
     {
       id: 1,
+      name: "Шарф болельщика (синий)",
+      price: 1500,
+      image: "https://cdn.poehali.dev/files/8dfe67f9-436f-4f07-97ef-eeaed8547e5f.jpg",
+      category: "accessories",
+      description: "Фанатский шарф в цветах команды Сибирские Снайперы. Отличный аксессуар для холодных матчей."
+    },
+    {
+      id: 2,
+      name: "Вымпел команды (синий)",
+      price: 1200,
+      image: "https://cdn.poehali.dev/files/29db9d33-8826-4926-8137-b51a4332b977.jpg",
+      category: "accessories",
+      description: "Официальный вымпел с логотипом Сибирских Снайперов. Синий цвет с белой бахромой."
+    },
+    {
+      id: 3,
+      name: "Вымпел команды (голубой)",
+      price: 1200,
+      image: "https://cdn.poehali.dev/files/66332941-ba92-4144-8086-aff1bc66bb4b.jpg",
+      category: "accessories",
+      description: "Официальный вымпел с логотипом Сибирских Снайперов. Голубой цвет с белой бахромой."
+    },
+    {
+      id: 4,
+      name: "Значок команды",
+      price: 400,
+      image: "https://cdn.poehali.dev/files/d57890bf-5a57-4480-9c91-61a71afce555.jpg",
+      category: "accessories",
+      description: "Коллекционный значок с логотипом Сибирских Снайперов. Металл с эмалью."
+    },
+    {
+      id: 5,
       name: "Игровое джерси с логотипом",
       price: 4500,
       image: "https://cdn.poehali.dev/files/097edba3-4667-492c-8fdc-1be95663ce9e.png",
       category: "apparel",
       sizes: ["S", "M", "L", "XL", "XXL"],
       description: "Официальное игровое джерси команды Сибирские Снайперы. Высококачественный материал с технологией отвода влаги."
-    },
-    {
-      id: 2,
-      name: "Тренировочное джерси",
-      price: 3500,
-      image: "https://cdn.poehali.dev/files/097edba3-4667-492c-8fdc-1be95663ce9e.png",
-      category: "apparel",
-      sizes: ["S", "M", "L", "XL", "XXL"],
-      description: "Тренировочная форма команды для фанатов. Комфортная и дышащая ткань."
-    },
-    {
-      id: 3,
-      name: "Шайба с логотипом команды",
-      price: 800,
-      image: "https://cdn.poehali.dev/files/5eafa8e1-7cd4-4959-927d-702849e9a9e9.jpg",
-      category: "accessories",
-      description: "Официальная игровая шайба с логотипом Сибирских Снайперов. Идеальный сувенир для коллекционеров."
-    },
-    {
-      id: 4,
-      name: "Кепка с логотипом",
-      price: 1200,
-      image: "https://cdn.poehali.dev/files/097edba3-4667-492c-8fdc-1be95663ce9e.png",
-      category: "accessories",
-      description: "Стильная бейсболка с вышитым логотипом команды. Регулируемый размер."
-    },
-    {
-      id: 5,
-      name: "Шарф болельщика",
-      price: 1500,
-      image: "https://cdn.poehali.dev/files/097edba3-4667-492c-8fdc-1be95663ce9e.png",
-      category: "accessories",
-      description: "Теплый шарф в цветах команды. Отличный аксессуар для холодных матчей."
     },
     {
       id: 6,
@@ -90,28 +89,36 @@ const Shop = () => {
     },
     {
       id: 7,
-      name: "Клюшка сувенирная",
-      price: 2500,
-      image: "https://cdn.poehali.dev/files/097edba3-4667-492c-8fdc-1be95663ce9e.png",
-      category: "accessories",
-      description: "Мини-клюшка с автографами игроков. Лимитированная серия."
-    },
-    {
-      id: 8,
-      name: "Термокружка",
-      price: 900,
-      image: "https://cdn.poehali.dev/files/097edba3-4667-492c-8fdc-1be95663ce9e.png",
-      category: "accessories",
-      description: "Термокружка с логотипом команды. Сохраняет температуру до 6 часов."
-    },
-    {
-      id: 9,
       name: "Футболка фанатская",
       price: 1800,
       image: "https://cdn.poehali.dev/files/097edba3-4667-492c-8fdc-1be95663ce9e.png",
       category: "apparel",
       sizes: ["S", "M", "L", "XL", "XXL"],
       description: "Повседневная футболка с принтом команды. 100% хлопок."
+    },
+    {
+      id: 8,
+      name: "Шайба с логотипом команды",
+      price: 800,
+      image: "https://cdn.poehali.dev/files/5eafa8e1-7cd4-4959-927d-702849e9a9e9.jpg",
+      category: "accessories",
+      description: "Официальная игровая шайба с логотипом Сибирских Снайперов. Идеальный сувенир для коллекционеров."
+    },
+    {
+      id: 9,
+      name: "Кепка с логотипом",
+      price: 1200,
+      image: "https://cdn.poehali.dev/files/097edba3-4667-492c-8fdc-1be95663ce9e.png",
+      category: "accessories",
+      description: "Стильная бейсболка с вышитым логотипом команды. Регулируемый размер."
+    },
+    {
+      id: 10,
+      name: "Термокружка",
+      price: 900,
+      image: "https://cdn.poehali.dev/files/097edba3-4667-492c-8fdc-1be95663ce9e.png",
+      category: "accessories",
+      description: "Термокружка с логотипом команды. Сохраняет температуру до 6 часов."
     }
   ];
 
@@ -245,18 +252,16 @@ const Shop = () => {
                 )}
               </div>
               <CardHeader>
-                <CardTitle className="font-oswald text-xl">{product.name}</CardTitle>
-                <p className="text-sm text-muted-foreground line-clamp-2">{product.description}</p>
-              </CardHeader>
-              <CardContent>
-                <div className="flex justify-between items-center">
-                  <span className="text-3xl font-bold text-primary">{product.price} ₽</span>
-                  <Button className="font-oswald">
-                    <Icon name="ShoppingCart" className="mr-2" size={18} />
+                <CardTitle className="text-xl font-oswald">{product.name}</CardTitle>
+                <p className="text-sm text-muted-foreground">{product.description}</p>
+                <div className="flex items-center justify-between mt-4">
+                  <span className="text-2xl font-bold text-accent">{product.price} ₽</span>
+                  <Button size="sm" className="font-oswald">
+                    <Icon name="ShoppingCart" size={16} className="mr-1" />
                     КУПИТЬ
                   </Button>
                 </div>
-              </CardContent>
+              </CardHeader>
             </Card>
           ))}
         </div>
@@ -265,8 +270,8 @@ const Shop = () => {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="font-oswald text-2xl">
-              {isPurchased ? "ЗАКАЗ ОФОРМЛЕН!" : "ОФОРМЛЕНИЕ ЗАКАЗА"}
+            <DialogTitle className="text-2xl font-oswald">
+              {isPurchased ? "ПОКУПКА ОФОРМЛЕНА!" : "ОФОРМЛЕНИЕ ПОКУПКИ"}
             </DialogTitle>
           </DialogHeader>
 
@@ -275,160 +280,158 @@ const Shop = () => {
               <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
                 <Icon name="Check" size={48} className="text-green-600" />
               </div>
-              <h3 className="text-2xl font-oswald">Спасибо за покупку!</h3>
-              <p className="text-muted-foreground">
-                Ваш заказ принят и будет отправлен в ближайшее время
-              </p>
+              <h3 className="text-2xl font-oswald text-green-600">СПАСИБО ЗА ПОКУПКУ!</h3>
+              <p className="text-muted-foreground">Ваш заказ успешно оформлен. Мы отправим детали на указанный email.</p>
             </div>
           ) : (
             <div className="space-y-6">
               {selectedProduct && (
-                <>
-                  <div className="flex gap-4 p-4 bg-gray-50 rounded-lg">
-                    <img 
-                      src={selectedProduct.image} 
-                      alt={selectedProduct.name}
-                      className="w-24 h-24 object-contain"
-                    />
-                    <div className="flex-1">
-                      <h3 className="font-oswald text-lg">{selectedProduct.name}</h3>
-                      <p className="text-sm text-muted-foreground">{selectedProduct.description}</p>
-                      <p className="text-2xl font-bold text-primary mt-2">{selectedProduct.price} ₽</p>
-                    </div>
-                  </div>
-
-                  {selectedProduct.sizes && (
-                    <div className="space-y-2">
-                      <Label className="font-oswald">Размер</Label>
-                      <div className="flex gap-2">
+                <div className="flex gap-4 p-4 bg-muted/30 rounded-lg">
+                  <img 
+                    src={selectedProduct.image} 
+                    alt={selectedProduct.name}
+                    className="w-24 h-24 object-contain rounded"
+                  />
+                  <div className="flex-1">
+                    <h3 className="font-oswald text-lg">{selectedProduct.name}</h3>
+                    <p className="text-sm text-muted-foreground">{selectedProduct.description}</p>
+                    {selectedProduct.sizes && (
+                      <div className="flex gap-2 mt-2">
                         {selectedProduct.sizes.map(size => (
                           <Button
                             key={size}
+                            size="sm"
                             variant={selectedSize === size ? "default" : "outline"}
                             onClick={() => setSelectedSize(size)}
-                            className="font-oswald"
+                            className="w-12"
                           >
                             {size}
                           </Button>
                         ))}
                       </div>
-                    </div>
-                  )}
-
-                  <div className="space-y-2">
-                    <Label className="font-oswald">Количество</Label>
-                    <div className="flex items-center gap-3">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      >
-                        <Icon name="Minus" size={18} />
-                      </Button>
-                      <span className="text-2xl font-bold w-12 text-center">{quantity}</span>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setQuantity(Math.min(10, quantity + 1))}
-                      >
-                        <Icon name="Plus" size={18} />
-                      </Button>
-                    </div>
+                    )}
                   </div>
-
-                  <div className="border-t pt-4">
-                    <div className="flex justify-between items-center mb-4">
-                      <span className="font-oswald text-xl">ИТОГО:</span>
-                      <span className="text-3xl font-bold text-primary">{totalPrice} ₽</span>
-                    </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-accent">{selectedProduct.price} ₽</p>
                   </div>
+                </div>
+              )}
 
-                  <div className="space-y-4">
-                    <h4 className="font-oswald text-lg border-t pt-4">Контактные данные</h4>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="firstName">Имя *</Label>
-                        <Input
-                          id="firstName"
-                          value={formData.firstName}
-                          onChange={(e) => handleInputChange("firstName", e.target.value)}
-                          placeholder="Иван"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="lastName">Фамилия *</Label>
-                        <Input
-                          id="lastName"
-                          value={formData.lastName}
-                          onChange={(e) => handleInputChange("lastName", e.target.value)}
-                          placeholder="Иванов"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email *</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => handleInputChange("email", e.target.value)}
-                        placeholder="ivan@example.com"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Телефон *</Label>
-                      <Input
-                        id="phone"
-                        value={formData.phone}
-                        onChange={(e) => handleInputChange("phone", e.target.value)}
-                        placeholder="+7 (999) 123-45-67"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="address">Адрес доставки *</Label>
-                      <Input
-                        id="address"
-                        value={formData.address}
-                        onChange={(e) => handleInputChange("address", e.target.value)}
-                        placeholder="Улица, дом, квартира"
-                      />
-                    </div>
-
-                    <h4 className="font-oswald text-lg border-t pt-4">Оплата картой</h4>
-                    <div className="space-y-2">
-                      <Label htmlFor="cardNumber">Номер карты *</Label>
-                      <Input
-                        id="cardNumber"
-                        value={formData.cardNumber}
-                        onChange={(e) => handleInputChange("cardNumber", e.target.value)}
-                        placeholder="1234 5678 9012 3456"
-                        maxLength={16}
-                      />
-                    </div>
-
-                    <Button 
-                      className="w-full font-oswald text-lg py-6"
-                      disabled={!isFormValid || isProcessing}
-                      onClick={handlePurchase}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Количество</Label>
+                  <div className="flex gap-2 mt-1">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      disabled={quantity <= 1}
                     >
-                      {isProcessing ? (
-                        <>
-                          <Icon name="Loader2" className="mr-2 animate-spin" size={20} />
-                          ОБРАБОТКА...
-                        </>
-                      ) : (
-                        <>
-                          <Icon name="CreditCard" className="mr-2" size={20} />
-                          ОПЛАТИТЬ {totalPrice} ₽
-                        </>
-                      )}
+                      <Icon name="Minus" size={16} />
+                    </Button>
+                    <Input
+                      type="number"
+                      value={quantity}
+                      onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                      className="text-center"
+                      min="1"
+                    />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setQuantity(quantity + 1)}
+                    >
+                      <Icon name="Plus" size={16} />
                     </Button>
                   </div>
-                </>
-              )}
+                </div>
+                <div className="flex items-end">
+                  <div className="w-full">
+                    <Label>Итого</Label>
+                    <div className="text-3xl font-bold text-accent mt-1">{totalPrice} ₽</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t pt-6 space-y-4">
+                <h4 className="font-oswald text-lg">ДАННЫЕ ПОКУПАТЕЛЯ</h4>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Имя *</Label>
+                    <Input
+                      value={formData.firstName}
+                      onChange={(e) => handleInputChange("firstName", e.target.value)}
+                      placeholder="Иван"
+                    />
+                  </div>
+                  <div>
+                    <Label>Фамилия *</Label>
+                    <Input
+                      value={formData.lastName}
+                      onChange={(e) => handleInputChange("lastName", e.target.value)}
+                      placeholder="Иванов"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label>Email *</Label>
+                  <Input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => handleInputChange("email", e.target.value)}
+                    placeholder="example@mail.com"
+                  />
+                </div>
+
+                <div>
+                  <Label>Телефон *</Label>
+                  <Input
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => handleInputChange("phone", e.target.value)}
+                    placeholder="89001234567"
+                  />
+                </div>
+
+                <div>
+                  <Label>Адрес доставки *</Label>
+                  <Input
+                    value={formData.address}
+                    onChange={(e) => handleInputChange("address", e.target.value)}
+                    placeholder="г. Москва, ул. Ленина, д. 1, кв. 1"
+                  />
+                </div>
+
+                <div>
+                  <Label>Номер карты *</Label>
+                  <Input
+                    value={formData.cardNumber}
+                    onChange={(e) => handleInputChange("cardNumber", e.target.value)}
+                    placeholder="1234 5678 9012 3456"
+                    maxLength={16}
+                  />
+                </div>
+              </div>
+
+              <Button
+                className="w-full font-oswald text-lg py-6"
+                onClick={handlePurchase}
+                disabled={!isFormValid || isProcessing}
+              >
+                {isProcessing ? (
+                  <>
+                    <Icon name="Loader2" className="mr-2 animate-spin" size={20} />
+                    ОБРАБОТКА...
+                  </>
+                ) : (
+                  <>
+                    <Icon name="CreditCard" className="mr-2" size={20} />
+                    ОПЛАТИТЬ {totalPrice} ₽
+                  </>
+                )}
+              </Button>
             </div>
           )}
         </DialogContent>

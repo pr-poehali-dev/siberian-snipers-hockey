@@ -24,7 +24,7 @@ const Index = () => {
     { id: 8, name: "Martyska", number: 16, position: "Универсальный", goals: 0, assists: 0, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/21adbbc8-83a8-451f-85b8-1bdbc6849ede.jpg" },
     { id: 9, name: "Maksimka", number: 72, position: "Универсальный", goals: 0, assists: 0, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/9c4d93b4-56cc-4742-a055-9d0fb82ab3e9.jpg" },
     { id: 10, name: "Mishurov", number: 1, position: "Универсальный", goals: 0, assists: 0, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/099efe08-5f23-401d-b466-9b148166e3b9.jpg" },
-    { id: 11, name: "kenzo", number: 10, position: "Универсальный", goals: 0, assists: 0, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/100e1e18-a675-41af-b1c4-4ee35fefb9fc.jpg", isAssistant: true }
+    { id: 11, name: "kenzo", number: 10, position: "Универсальный", goals: 0, assists: 0, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/100e1e18-a675-41af-b1c4-4ee35fefb9fc.jpg" }
   ];
 
   const matches: Array<{id: number; date: string; opponent: string; home: boolean; score: string; status: string}> = [
@@ -90,13 +90,11 @@ const Index = () => {
 
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="w-full grid grid-cols-6 mb-8 h-auto">
-            <TabsTrigger value="players" className="font-oswald text-sm py-4 px-4">ИГРОКИ</TabsTrigger>
-            <TabsTrigger value="matches" className="font-oswald text-sm py-4 px-4">МАТЧИ</TabsTrigger>
-            <TabsTrigger value="news" className="font-oswald text-sm py-4 px-4">НОВОСТИ</TabsTrigger>
-            <TabsTrigger value="standings" className="font-oswald text-sm py-4 px-4 whitespace-normal">ТАБЛИЦА</TabsTrigger>
-            <TabsTrigger value="management" className="font-oswald text-sm py-4 px-4">РУКОВОДСТВО</TabsTrigger>
-            <TabsTrigger value="shop" className="font-oswald text-sm py-4 px-4">МАГАЗИН</TabsTrigger>
+          <TabsList className="w-full grid grid-cols-4 mb-8 h-auto">
+            <TabsTrigger value="players" className="font-oswald text-sm py-4 px-2">ИГРОКИ</TabsTrigger>
+            <TabsTrigger value="matches" className="font-oswald text-sm py-4 px-2">МАТЧИ</TabsTrigger>
+            <TabsTrigger value="news" className="font-oswald text-sm py-4 px-2">НОВОСТИ</TabsTrigger>
+            <TabsTrigger value="standings" className="font-oswald text-sm py-4 px-2">ТАБЛИЦА</TabsTrigger>
           </TabsList>
 
           <TabsContent value="players" className="space-y-6 min-h-[400px]">
