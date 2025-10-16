@@ -33,11 +33,19 @@ const Index = () => {
     { id: 3, date: "19.10", opponent: "Магнитка", home: false, score: "-:-", status: "Скоро" }
   ];
 
-  const news: Array<{id: number; title: string; date: string; image: string; excerpt: string}> = [
-    { id: 1, title: "Сибирские Снайперы готовятся к новому сезону", date: "15.10.2025", image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/d96e463a-f0e4-40e5-8913-6f07d929e5ba.jpg", excerpt: "Команда провела интенсивные тренировки перед стартом сезона" },
-    { id: 2, title: "Новые игроки в составе команды", date: "14.10.2025", image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/d96e463a-f0e4-40e5-8913-6f07d929e5ba.jpg", excerpt: "Руководство клуба объявило о подписании контрактов с новыми хоккеистами" },
-    { id: 3, title: "Билеты на первый матч уже в продаже", date: "13.10.2025", image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/d96e463a-f0e4-40e5-8913-6f07d929e5ba.jpg", excerpt: "Не упустите возможность поддержать команду на домашней арене" }
-  ];
+  const getNewsList = () => {
+    const storedNews = localStorage.getItem("club_news");
+    if (storedNews) {
+      return JSON.parse(storedNews);
+    }
+    return [
+      { id: 1, title: "Сибирские Снайперы готовятся к новому сезону", date: "15.10.2025", image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/d96e463a-f0e4-40e5-8913-6f07d929e5ba.jpg", excerpt: "Команда провела интенсивные тренировки перед стартом сезона" },
+      { id: 2, title: "Новые игроки в составе команды", date: "14.10.2025", image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/d96e463a-f0e4-40e5-8913-6f07d929e5ba.jpg", excerpt: "Руководство клуба объявило о подписании контрактов с новыми хоккеистами" },
+      { id: 3, title: "Билеты на первый матч уже в продаже", date: "13.10.2025", image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/d96e463a-f0e4-40e5-8913-6f07d929e5ba.jpg", excerpt: "Не упустите возможность поддержать команду на домашней арене" }
+    ];
+  };
+
+  const news = getNewsList();
 
   const standings: Array<{place: number; team: string; games: number; wins: number; losses: number; points: number}> = [];
 
@@ -418,6 +426,12 @@ const Index = () => {
           </div>
           <div className="border-t border-white/20 pt-8 text-center text-white/60">
             <p>© 2025 Сибирские Снайперы. Все права защищены.</p>
+            <button 
+              onClick={() => navigate("/admin")}
+              className="mt-4 text-xs opacity-20 hover:opacity-100 transition-opacity"
+            >
+              Админ
+            </button>
           </div>
         </div>
       </footer>
