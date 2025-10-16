@@ -1,35 +1,19 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import Icon from "@/components/ui/icon";
-
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  category: string;
-  sizes?: string[];
-  description: string;
-  customizable?: boolean;
-}
-
-interface CartItem extends Product {
-  quantity: number;
-  selectedSize?: string;
-  customName?: string;
-  customNumber?: string;
-}
+import { products } from "@/components/shop/products";
+import { CartItem, FormData } from "@/components/shop/types";
+import ProductCard from "@/components/shop/ProductCard";
+import ProductDialog from "@/components/shop/ProductDialog";
+import CartDialog from "@/components/shop/CartDialog";
+import CheckoutDialog from "@/components/shop/CheckoutDialog";
 
 const Shop = () => {
   const navigate = useNavigate();
   const [cart, setCart] = React.useState<CartItem[]>([]);
-  const [selectedProduct, setSelectedProduct] = React.useState<Product | null>(null);
+  const [selectedProduct, setSelectedProduct] = React.useState<typeof products[0] | null>(null);
   const [selectedSize, setSelectedSize] = React.useState("");
   const [customName, setCustomName] = React.useState("");
   const [customNumber, setCustomNumber] = React.useState("");
@@ -40,7 +24,7 @@ const Shop = () => {
   const [isCheckoutOpen, setIsCheckoutOpen] = React.useState(false);
   const [isProcessing, setIsProcessing] = React.useState(false);
   const [isPurchased, setIsPurchased] = React.useState(false);
-  const [formData, setFormData] = React.useState({
+  const [formData, setFormData] = React.useState<FormData>({
     firstName: "",
     lastName: "",
     email: "",
@@ -49,92 +33,13 @@ const Shop = () => {
     cardNumber: ""
   });
 
-  const products: Product[] = [
-    {
-      id: 1,
-      name: "Джерси (Белое)",
-      price: 5500,
-      image: "https://cdn.poehali.dev/files/6e931c08-0d32-4672-87d9-591ac87907ab.jpg",
-      category: "jerseys",
-      sizes: ["S", "M", "L", "XL", "XXL"],
-      customizable: true,
-      description: "Белое игровое джерси. Кастомизация: ваша фамилия и номер."
-    },
-    {
-      id: 2,
-      name: "Джерси (Синее)",
-      price: 5500,
-      image: "https://cdn.poehali.dev/files/6e931c08-0d32-4672-87d9-591ac87907ab.jpg",
-      category: "jerseys",
-      sizes: ["S", "M", "L", "XL", "XXL"],
-      customizable: true,
-      description: "Синее игровое джерси. Кастомизация: ваша фамилия и номер."
-    },
-    {
-      id: 3,
-      name: "Кепка с логотипом",
-      price: 1200,
-      image: "https://cdn.poehali.dev/files/1460be37-29a0-4457-aeb9-9288e452230b.jpg",
-      category: "accessories",
-      description: "Стильная бейсболка 'Сибирский Стиль' с вышивкой. Регулируемый размер."
-    },
-    {
-      id: 4,
-      name: "Шапка команды",
-      price: 1000,
-      image: "https://cdn.poehali.dev/files/4cecdb91-a1de-4f80-9a00-da98ea2beb73.jpg",
-      category: "accessories",
-      description: "Тёплая вязаная шапка с логотипом Сибирских Снайперов."
-    },
-    {
-      id: 5,
-      name: "Шайба с логотипом",
-      price: 800,
-      image: "https://cdn.poehali.dev/files/6c4134be-19ee-45f7-9269-d7c027a5d271.jpg",
-      category: "accessories",
-      description: "Официальная игровая шайба с логотипом. Коллекционная молодёжная команда. Идеальный сувенир."
-    },
-    {
-      id: 6,
-      name: "Шарф болельщика (синий)",
-      price: 1500,
-      image: "https://cdn.poehali.dev/files/8dfe67f9-436f-4f07-97ef-eeaed8547e5f.jpg",
-      category: "accessories",
-      description: "Фанатский шарф в цветах команды Сибирские Снайперы."
-    },
-    {
-      id: 7,
-      name: "Вымпел команды (синий)",
-      price: 1200,
-      image: "https://cdn.poehali.dev/files/29db9d33-8826-4926-8137-b51a4332b977.jpg",
-      category: "accessories",
-      description: "Официальный вымпел с логотипом. Синий цвет с белой бахромой."
-    },
-    {
-      id: 8,
-      name: "Вымпел команды (голубой)",
-      price: 1200,
-      image: "https://cdn.poehali.dev/files/66332941-ba92-4144-8086-aff1bc66bb4b.jpg",
-      category: "accessories",
-      description: "Официальный вымпел с логотипом. Голубой цвет с белой бахромой."
-    },
-    {
-      id: 9,
-      name: "Значок команды",
-      price: 400,
-      image: "https://cdn.poehali.dev/files/d57890bf-5a57-4480-9c91-61a71afce555.jpg",
-      category: "accessories",
-      description: "Коллекционный значок с логотипом. Металл с эмалью."
-    }
-  ];
-
   const filteredProducts = categoryFilter === "all" 
     ? products 
     : products.filter(p => p.category === categoryFilter);
 
   const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
-  const handleProductClick = (product: Product) => {
+  const handleProductClick = (product: typeof products[0]) => {
     setSelectedProduct(product);
     setSelectedSize(product.sizes ? product.sizes[0] : "");
     setCustomName("");
@@ -323,330 +228,54 @@ const Shop = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProducts.map((product) => (
-            <Card 
+            <ProductCard 
               key={product.id} 
-              className="hover:shadow-xl transition-all cursor-pointer overflow-hidden group"
-              onClick={() => handleProductClick(product)}
-            >
-              <div className="relative h-64 bg-gray-100 flex items-center justify-center overflow-hidden">
-                <img 
-                  src={product.image} 
-                  alt={product.name}
-                  className="max-w-full max-h-full object-contain p-4 group-hover:scale-110 transition-transform duration-300"
-                />
-                {product.customizable && (
-                  <Badge className="absolute top-4 right-4 bg-purple-600">
-                    <Icon name="Pencil" size={14} className="mr-1" />
-                    Кастомизация
-                  </Badge>
-                )}
-              </div>
-              <CardHeader>
-                <CardTitle className="text-xl font-oswald">{product.name}</CardTitle>
-                <p className="text-sm text-muted-foreground">{product.description}</p>
-                <div className="flex items-center justify-between mt-4">
-                  <span className="text-2xl font-bold text-accent">{product.price} ₽</span>
-                  <Button size="sm" className="font-oswald">
-                    <Icon name="ShoppingCart" size={16} className="mr-1" />
-                    В КОРЗИНУ
-                  </Button>
-                </div>
-              </CardHeader>
-            </Card>
+              product={product} 
+              onClick={handleProductClick}
+            />
           ))}
         </div>
       </div>
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-oswald">ДОБАВИТЬ В КОРЗИНУ</DialogTitle>
-          </DialogHeader>
+      <ProductDialog
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        product={selectedProduct}
+        selectedSize={selectedSize}
+        setSelectedSize={setSelectedSize}
+        customName={customName}
+        setCustomName={setCustomName}
+        customNumber={customNumber}
+        setCustomNumber={setCustomNumber}
+        quantity={quantity}
+        setQuantity={setQuantity}
+        onAddToCart={handleAddToCart}
+      />
 
-          {selectedProduct && (
-            <div className="space-y-6">
-              <div className="flex gap-4 p-4 bg-muted/30 rounded-lg">
-                <img 
-                  src={selectedProduct.image} 
-                  alt={selectedProduct.name}
-                  className="w-24 h-24 object-contain rounded"
-                />
-                <div className="flex-1">
-                  <h3 className="font-oswald text-lg">{selectedProduct.name}</h3>
-                  <p className="text-sm text-muted-foreground">{selectedProduct.description}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-accent">{selectedProduct.price} ₽</p>
-                </div>
-              </div>
+      <CartDialog
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        cart={cart}
+        onRemoveItem={handleRemoveFromCart}
+        onCheckout={() => {
+          setIsCartOpen(false);
+          setIsCheckoutOpen(true);
+        }}
+        total={cartTotal}
+      />
 
-              {selectedProduct.sizes && (
-                <div>
-                  <Label>Размер</Label>
-                  <div className="flex gap-2 mt-2">
-                    {selectedProduct.sizes.map(size => (
-                      <Button
-                        key={size}
-                        size="sm"
-                        variant={selectedSize === size ? "default" : "outline"}
-                        onClick={() => setSelectedSize(size)}
-                        className="w-12"
-                      >
-                        {size}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {selectedProduct.customizable && (
-                <div className="space-y-4 border-t pt-4">
-                  <h4 className="font-oswald text-lg flex items-center">
-                    <Icon name="Pencil" className="mr-2" size={20} />
-                    КАСТОМИЗАЦИЯ
-                  </h4>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label>Фамилия *</Label>
-                      <Input
-                        value={customName}
-                        onChange={(e) => setCustomName(e.target.value.toUpperCase())}
-                        placeholder="IVANOV"
-                        maxLength={15}
-                      />
-                    </div>
-                    <div>
-                      <Label>Номер *</Label>
-                      <Input
-                        type="number"
-                        value={customNumber}
-                        onChange={(e) => setCustomNumber(e.target.value)}
-                        placeholder="99"
-                        min="0"
-                        max="99"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <div>
-                <Label>Количество</Label>
-                <div className="flex gap-2 mt-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    disabled={quantity <= 1}
-                  >
-                    <Icon name="Minus" size={16} />
-                  </Button>
-                  <Input
-                    type="number"
-                    value={quantity}
-                    onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                    className="text-center w-20"
-                    min="1"
-                  />
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setQuantity(quantity + 1)}
-                  >
-                    <Icon name="Plus" size={16} />
-                  </Button>
-                </div>
-              </div>
-
-              <Button
-                className="w-full font-oswald text-lg py-6"
-                onClick={handleAddToCart}
-              >
-                <Icon name="ShoppingCart" className="mr-2" size={20} />
-                ДОБАВИТЬ В КОРЗИНУ
-              </Button>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isCartOpen} onOpenChange={setIsCartOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-oswald">КОРЗИНА</DialogTitle>
-          </DialogHeader>
-
-          {cart.length === 0 ? (
-            <div className="text-center py-8">
-              <Icon name="ShoppingCart" size={64} className="mx-auto mb-4 opacity-30" />
-              <p className="text-lg text-muted-foreground">Корзина пуста</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {cart.map((item, index) => (
-                <div key={index} className="flex gap-4 p-4 border rounded-lg">
-                  <img src={item.image} alt={item.name} className="w-20 h-20 object-contain" />
-                  <div className="flex-1">
-                    <h3 className="font-oswald text-lg">{item.name}</h3>
-                    {item.customName && item.customNumber && (
-                      <p className="text-sm text-purple-600 font-bold">
-                        {item.customName} #{item.customNumber}
-                      </p>
-                    )}
-                    {item.selectedSize && (
-                      <p className="text-sm text-muted-foreground">Размер: {item.selectedSize}</p>
-                    )}
-                    <p className="text-sm text-muted-foreground">Количество: {item.quantity}</p>
-                    <p className="font-bold mt-2">{item.price * item.quantity} ₽</p>
-                  </div>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleRemoveFromCart(index)}
-                  >
-                    <Icon name="Trash2" size={16} />
-                  </Button>
-                </div>
-              ))}
-
-              <div className="border-t pt-4">
-                <div className="flex justify-between items-center mb-4">
-                  <span className="text-2xl font-oswald">ИТОГО:</span>
-                  <span className="text-3xl font-bold text-accent">{cartTotal} ₽</span>
-                </div>
-                <Button
-                  className="w-full font-oswald text-lg py-6"
-                  onClick={() => {
-                    setIsCartOpen(false);
-                    setIsCheckoutOpen(true);
-                  }}
-                >
-                  <Icon name="CreditCard" className="mr-2" size={20} />
-                  ОФОРМИТЬ ЗАКАЗ
-                </Button>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isCheckoutOpen} onOpenChange={setIsCheckoutOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-oswald">
-              {isPurchased ? "ПОКУПКА ОФОРМЛЕНА!" : "ОФОРМЛЕНИЕ ЗАКАЗА"}
-            </DialogTitle>
-          </DialogHeader>
-
-          {isPurchased ? (
-            <div className="text-center py-8 space-y-4">
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-                <Icon name="Check" size={48} className="text-green-600" />
-              </div>
-              <h3 className="text-2xl font-oswald text-green-600">СПАСИБО ЗА ПОКУПКУ!</h3>
-              <p className="text-muted-foreground">Ваш заказ успешно оформлен. Мы отправим детали на указанный email.</p>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              <div className="bg-muted/30 p-4 rounded-lg">
-                <h4 className="font-oswald mb-2">ВАШ ЗАКАЗ:</h4>
-                {cart.map((item, idx) => (
-                  <div key={idx} className="flex justify-between text-sm mb-1">
-                    <span>
-                      {item.name} {item.customName ? `(${item.customName} #${item.customNumber})` : ""} x{item.quantity}
-                    </span>
-                    <span>{item.price * item.quantity} ₽</span>
-                  </div>
-                ))}
-                <div className="border-t mt-2 pt-2 flex justify-between font-bold">
-                  <span>ИТОГО:</span>
-                  <span className="text-accent text-xl">{cartTotal} ₽</span>
-                </div>
-              </div>
-
-              <div className="border-t pt-6 space-y-4">
-                <h4 className="font-oswald text-lg">ДАННЫЕ ПОКУПАТЕЛЯ</h4>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label>Имя *</Label>
-                    <Input
-                      value={formData.firstName}
-                      onChange={(e) => handleInputChange("firstName", e.target.value)}
-                      placeholder="Иван"
-                    />
-                  </div>
-                  <div>
-                    <Label>Фамилия *</Label>
-                    <Input
-                      value={formData.lastName}
-                      onChange={(e) => handleInputChange("lastName", e.target.value)}
-                      placeholder="Иванов"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label>Email *</Label>
-                  <Input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange("email", e.target.value)}
-                    placeholder="example@mail.com"
-                  />
-                </div>
-
-                <div>
-                  <Label>Телефон *</Label>
-                  <Input
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => handleInputChange("phone", e.target.value)}
-                    placeholder="89001234567"
-                  />
-                </div>
-
-                <div>
-                  <Label>Адрес доставки *</Label>
-                  <Input
-                    value={formData.address}
-                    onChange={(e) => handleInputChange("address", e.target.value)}
-                    placeholder="г. Москва, ул. Ленина, д. 1, кв. 1"
-                  />
-                </div>
-
-                <div>
-                  <Label>Номер карты *</Label>
-                  <Input
-                    value={formData.cardNumber}
-                    onChange={(e) => handleInputChange("cardNumber", e.target.value)}
-                    placeholder="1234 5678 9012 3456"
-                    maxLength={16}
-                  />
-                </div>
-              </div>
-
-              <Button
-                className="w-full font-oswald text-lg py-6"
-                onClick={handlePurchase}
-                disabled={!isFormValid || isProcessing}
-              >
-                {isProcessing ? (
-                  <>
-                    <Icon name="Loader2" className="mr-2 animate-spin" size={20} />
-                    ОБРАБОТКА...
-                  </>
-                ) : (
-                  <>
-                    <Icon name="CreditCard" className="mr-2" size={20} />
-                    ОПЛАТИТЬ {cartTotal} ₽
-                  </>
-                )}
-              </Button>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      <CheckoutDialog
+        isOpen={isCheckoutOpen}
+        onClose={() => setIsCheckoutOpen(false)}
+        cart={cart}
+        total={cartTotal}
+        formData={formData}
+        onFormChange={handleInputChange}
+        onPurchase={handlePurchase}
+        isProcessing={isProcessing}
+        isPurchased={isPurchased}
+        isFormValid={isFormValid}
+      />
     </div>
   );
 };
