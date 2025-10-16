@@ -53,6 +53,18 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background relative">
+      <div className="fixed top-4 left-4 z-50">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => navigate("/admin")}
+          className="bg-white/90 hover:bg-white shadow-lg"
+        >
+          <Icon name="Settings" className="mr-2" size={16} />
+          Админ
+        </Button>
+      </div>
+
       <div className="fixed inset-0 pointer-events-none opacity-5 z-0">
         <img 
           src="https://cdn.poehali.dev/files/5eafa8e1-7cd4-4959-927d-702849e9a9e9.jpg" 

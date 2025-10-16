@@ -114,6 +114,18 @@ const Tickets = () => {
 
   return (
     <div className="min-h-screen bg-background relative">
+      <div className="fixed top-4 left-4 z-50">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => navigate("/admin")}
+          className="bg-white/90 hover:bg-white shadow-lg"
+        >
+          <Icon name="Settings" className="mr-2" size={16} />
+          Админ
+        </Button>
+      </div>
+
       <div className="fixed inset-0 pointer-events-none opacity-5 z-0">
         <img 
           src="https://cdn.poehali.dev/files/5eafa8e1-7cd4-4959-927d-702849e9a9e9.jpg" 
@@ -209,25 +221,19 @@ const Tickets = () => {
                                     disabled={status === "occupied"}
                                     className={`
                                       w-7 h-7 rounded text-xs font-roboto transition-all
-                                      ${status === "available" ? "bg-muted hover:bg-muted/70 cursor-pointer" : ""}
-                                      ${status === "occupied" ? "bg-destructive cursor-not-allowed opacity-60" : ""}
-                                      ${status === "selected" ? "bg-accent text-white scale-110" : ""}
+                                      ${status === "available" ? "bg-muted hover:bg-muted/70" : ""}
+                                      ${status === "occupied" ? "bg-destructive cursor-not-allowed opacity-50" : ""}
+                                      ${status === "selected" ? "bg-accent text-white" : ""}
                                     `}
-                                    title={`Ряд ${row}, Место ${seat}`}
                                   >
                                     {seat}
                                   </button>
                                 );
                               })}
                             </div>
-                            <span className="text-sm font-roboto w-8 text-muted-foreground">{row}</span>
                           </div>
                         );
                       })}
-                    </div>
-                    
-                    <div className="text-center mt-6 text-muted-foreground font-oswald tracking-wider">
-                      СЕКТОР Д3
                     </div>
                   </div>
                 </CardContent>
@@ -239,34 +245,27 @@ const Tickets = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2 max-h-[600px] overflow-y-auto">
-                    {seats.filter(s => s.status === "available").map((seat) => {
-                      const isSelected = selectedSeats.some(
-                        s => s.row === seat.row && s.seat === seat.seat
-                      );
-                      
-                      return (
-                        <div
-                          key={`${seat.row}-${seat.seat}`}
-                          className={`
-                            flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-all
-                            ${isSelected ? "bg-accent text-white border-accent" : "hover:bg-muted/50"}
-                          `}
-                          onClick={() => handleSeatClick(seat)}
-                        >
-                          <div className="font-roboto">
-                            <span className="font-semibold">Ряд {seat.row}</span>
-                            <span className="mx-2">•</span>
-                            <span>Место {seat.seat}</span>
-                            <span className="mx-2">•</span>
-                            <span className="text-sm text-muted-foreground">Сектор {seat.sector}</span>
-                          </div>
-                          <div className="flex items-center gap-4">
-                            <span className="font-oswald text-lg">{seat.price} ₽</span>
-                            {isSelected && <Icon name="Check" size={20} />}
+                    {seats.filter(s => s.status === "available").map((seat) => (
+                      <div
+                        key={`${seat.row}-${seat.seat}`}
+                        className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 cursor-pointer"
+                        onClick={() => handleSeatClick(seat)}
+                      >
+                        <div className="flex items-center gap-4">
+                          <Icon name="Armchair" size={20} className="text-muted-foreground" />
+                          <div>
+                            <p className="font-oswald">Ряд {seat.row}, Место {seat.seat}</p>
+                            <p className="text-sm text-muted-foreground">Сектор {seat.sector}</p>
                           </div>
                         </div>
-                      );
-                    })}
+                        <div className="flex items-center gap-4">
+                          <Badge className="font-roboto">{seat.price} ₽</Badge>
+                          {selectedSeats.some(s => s.row === seat.row && s.seat === seat.seat) && (
+                            <Icon name="Check" size={20} className="text-accent" />
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </CardContent>
               </Card>
@@ -278,59 +277,46 @@ const Tickets = () => {
               <CardHeader>
                 <CardTitle className="font-oswald">ВАШИ БИЛЕТЫ</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4">
                 {selectedSeats.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
-                    <Icon name="Ticket" size={48} className="mx-auto mb-4 opacity-20" />
-                    <p className="font-roboto">Выберите места на схеме</p>
+                    <Icon name="Ticket" size={48} className="mx-auto mb-2 opacity-30" />
+                    <p>Выберите места</p>
                   </div>
                 ) : (
-                  <div className="space-y-4">
-                    <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                  <>
+                    <div className="space-y-2 max-h-40 overflow-y-auto">
                       {selectedSeats.map((seat) => (
-                        <div
-                          key={`${seat.row}-${seat.seat}`}
-                          className="flex items-center justify-between p-3 bg-muted rounded-lg"
-                        >
-                          <div className="font-roboto text-sm">
-                            <div className="font-semibold">Билет на матч</div>
-                            <div className="text-muted-foreground text-xs">Сибирские Снайперы - Академия Михайлова</div>
-                            <div className="text-xs mt-1">Ряд {seat.row}, Место {seat.seat}, Сектор {seat.sector}</div>
-                          </div>
+                        <div key={`${seat.row}-${seat.seat}`} className="flex items-center justify-between text-sm">
+                          <span>Ряд {seat.row}, Место {seat.seat}</span>
                           <div className="flex items-center gap-2">
-                            <span className="font-oswald">{seat.price} ₽</span>
+                            <span className="font-bold">{seat.price} ₽</span>
                             <Button
-                              size="sm"
                               variant="ghost"
+                              size="sm"
                               onClick={() => handleSeatClick(seat)}
+                              className="h-6 w-6 p-0"
                             >
-                              <Icon name="X" size={16} />
+                              <Icon name="X" size={14} />
                             </Button>
                           </div>
                         </div>
                       ))}
                     </div>
-
-                    <div className="border-t pt-4 space-y-2">
-                      <div className="flex justify-between font-roboto">
-                        <span>Количество билетов:</span>
-                        <span className="font-semibold">{selectedSeats.length}</span>
+                    <div className="border-t pt-4">
+                      <div className="flex justify-between items-center mb-4">
+                        <span className="font-oswald text-lg">ИТОГО:</span>
+                        <span className="font-bold text-2xl text-accent">{totalPrice} ₽</span>
                       </div>
-                      <div className="flex justify-between font-oswald text-xl">
-                        <span>ИТОГО:</span>
-                        <span>{totalPrice} ₽</span>
-                      </div>
+                      <Button
+                        className="w-full font-oswald"
+                        onClick={() => setIsDialogOpen(true)}
+                      >
+                        <Icon name="CreditCard" className="mr-2" size={18} />
+                        ОФОРМИТЬ
+                      </Button>
                     </div>
-
-                    <Button 
-                      className="w-full font-oswald text-lg" 
-                      size="lg"
-                      onClick={() => setIsDialogOpen(true)}
-                    >
-                      ОФОРМИТЬ ЗАКАЗ
-                      <Icon name="ArrowRight" size={20} className="ml-2" />
-                    </Button>
-                  </div>
+                  </>
                 )}
               </CardContent>
             </Card>
@@ -339,97 +325,87 @@ const Tickets = () => {
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          {!isPurchased ? (
-            <>
-              <DialogHeader>
-                <DialogTitle className="font-oswald text-2xl">ОФОРМЛЕНИЕ ЗАКАЗА</DialogTitle>
-                <DialogDescription className="font-roboto">
-                  Введите данные для покупки билетов
-                </DialogDescription>
-              </DialogHeader>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-oswald text-2xl">
+              {isPurchased ? "ГОТОВО!" : "ОФОРМЛЕНИЕ БИЛЕТОВ"}
+            </DialogTitle>
+            {!isPurchased && (
+              <DialogDescription>
+                Заполните данные для покупки билетов
+              </DialogDescription>
+            )}
+          </DialogHeader>
 
-              <div className="space-y-4 mt-4">
+          {isPurchased ? (
+            <div className="text-center py-8 space-y-4">
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                <Icon name="Check" size={48} className="text-green-600" />
+              </div>
+              <h3 className="text-2xl font-oswald text-green-600">БИЛЕТЫ КУПЛЕНЫ!</h3>
+              <p className="text-muted-foreground">Билеты отправлены на вашу электронную почту</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="bg-muted/30 p-4 rounded-lg space-y-2">
+                <h4 className="font-oswald mb-2">ВАШИ МЕСТА:</h4>
+                {selectedSeats.map((seat) => (
+                  <div key={`${seat.row}-${seat.seat}`} className="flex justify-between text-sm">
+                    <span>Ряд {seat.row}, Место {seat.seat}</span>
+                    <span>{seat.price} ₽</span>
+                  </div>
+                ))}
+                <div className="border-t pt-2 flex justify-between font-bold">
+                  <span>ИТОГО:</span>
+                  <span>{totalPrice} ₽</span>
+                </div>
+              </div>
+
+              <div className="space-y-3">
                 <div>
-                  <label className="text-sm font-roboto font-medium mb-2 block">
-                    Имя
-                  </label>
+                  <label className="text-sm font-medium">Имя</label>
                   <Input
-                    placeholder="Введите имя"
                     value={formData.firstName}
                     onChange={(e) => handleFormChange("firstName", e.target.value)}
-                    disabled={isProcessing}
+                    placeholder="Иван"
                   />
                 </div>
-
                 <div>
-                  <label className="text-sm font-roboto font-medium mb-2 block">
-                    Фамилия
-                  </label>
+                  <label className="text-sm font-medium">Фамилия</label>
                   <Input
-                    placeholder="Введите фамилию"
                     value={formData.lastName}
                     onChange={(e) => handleFormChange("lastName", e.target.value)}
-                    disabled={isProcessing}
+                    placeholder="Иванов"
                   />
                 </div>
-
                 <div>
-                  <label className="text-sm font-roboto font-medium mb-2 block">
-                    Номер карты
-                  </label>
+                  <label className="text-sm font-medium">Номер карты</label>
                   <Input
-                    placeholder="1234 5678 9012 3456"
-                    value={formData.cardNumber.replace(/(\d{4})/g, "$1 ").trim()}
+                    value={formData.cardNumber}
                     onChange={(e) => handleFormChange("cardNumber", e.target.value)}
-                    disabled={isProcessing}
-                    maxLength={19}
+                    placeholder="1234 5678 9012 3456"
+                    maxLength={16}
                   />
                 </div>
-
-                <div className="bg-muted p-4 rounded-lg">
-                  <div className="flex justify-between font-roboto text-sm mb-2">
-                    <span>Билетов:</span>
-                    <span className="font-semibold">{selectedSeats.length} шт</span>
-                  </div>
-                  <div className="flex justify-between font-oswald text-xl">
-                    <span>ИТОГО:</span>
-                    <span className="text-accent">{totalPrice} ₽</span>
-                  </div>
-                </div>
-
-                <Button
-                  className="w-full font-oswald text-lg"
-                  size="lg"
-                  onClick={handlePurchase}
-                  disabled={!isFormValid || isProcessing}
-                >
-                  {isProcessing ? (
-                    <>
-                      <Icon name="Loader2" size={20} className="mr-2 animate-spin" />
-                      ОБРАБОТКА...
-                    </>
-                  ) : (
-                    <>
-                      ОПЛАТИТЬ {totalPrice} ₽
-                      <Icon name="CreditCard" size={20} className="ml-2" />
-                    </>
-                  )}
-                </Button>
               </div>
-            </>
-          ) : (
-            <div className="text-center py-8">
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Icon name="CheckCircle2" size={48} className="text-green-600" />
-              </div>
-              <h3 className="font-oswald text-2xl mb-2">СПАСИБО ЗА ПОКУПКУ!</h3>
-              <p className="font-roboto text-muted-foreground">
-                Ваши билеты отправлены на почту
-              </p>
-              <p className="font-roboto text-sm text-muted-foreground mt-2">
-                {formData.firstName} {formData.lastName}
-              </p>
+
+              <Button
+                className="w-full font-oswald text-lg py-6"
+                onClick={handlePurchase}
+                disabled={!isFormValid || isProcessing}
+              >
+                {isProcessing ? (
+                  <>
+                    <Icon name="Loader2" className="mr-2 animate-spin" size={20} />
+                    ОБРАБОТКА...
+                  </>
+                ) : (
+                  <>
+                    <Icon name="ShoppingCart" className="mr-2" size={20} />
+                    ОПЛАТИТЬ {totalPrice} ₽
+                  </>
+                )}
+              </Button>
             </div>
           )}
         </DialogContent>

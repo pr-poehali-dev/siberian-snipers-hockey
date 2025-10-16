@@ -54,7 +54,7 @@ const Shop = () => {
       id: 1,
       name: "Джерси (Белое)",
       price: 5500,
-      image: "https://cdn.poehali.dev/files/097edba3-4667-492c-8fdc-1be95663ce9e.png",
+      image: "https://cdn.poehali.dev/files/6e931c08-0d32-4672-87d9-591ac87907ab.jpg",
       category: "jerseys",
       sizes: ["S", "M", "L", "XL", "XXL"],
       customizable: true,
@@ -64,7 +64,7 @@ const Shop = () => {
       id: 2,
       name: "Джерси (Синее)",
       price: 5500,
-      image: "https://cdn.poehali.dev/files/097edba3-4667-492c-8fdc-1be95663ce9e.png",
+      image: "https://cdn.poehali.dev/files/6e931c08-0d32-4672-87d9-591ac87907ab.jpg",
       category: "jerseys",
       sizes: ["S", "M", "L", "XL", "XXL"],
       customizable: true,
@@ -72,26 +72,30 @@ const Shop = () => {
     },
     {
       id: 3,
-      name: "Джерси (Чёрное)",
-      price: 5500,
-      image: "https://cdn.poehali.dev/files/097edba3-4667-492c-8fdc-1be95663ce9e.png",
-      category: "jerseys",
-      sizes: ["S", "M", "L", "XL", "XXL"],
-      customizable: true,
-      description: "Чёрное игровое джерси. Кастомизация: ваша фамилия и номер."
+      name: "Кепка с логотипом",
+      price: 1200,
+      image: "https://cdn.poehali.dev/files/1460be37-29a0-4457-aeb9-9288e452230b.jpg",
+      category: "accessories",
+      description: "Стильная бейсболка 'Сибирский Стиль' с вышивкой. Регулируемый размер."
     },
     {
       id: 4,
-      name: "Джерси (Голубое)",
-      price: 5500,
-      image: "https://cdn.poehali.dev/files/097edba3-4667-492c-8fdc-1be95663ce9e.png",
-      category: "jerseys",
-      sizes: ["S", "M", "L", "XL", "XXL"],
-      customizable: true,
-      description: "Голубое игровое джерси. Кастомизация: ваша фамилия и номер."
+      name: "Шапка команды",
+      price: 1000,
+      image: "https://cdn.poehali.dev/files/4cecdb91-a1de-4f80-9a00-da98ea2beb73.jpg",
+      category: "accessories",
+      description: "Тёплая вязаная шапка с логотипом Сибирских Снайперов."
     },
     {
       id: 5,
+      name: "Шайба с логотипом",
+      price: 800,
+      image: "https://cdn.poehali.dev/files/6c4134be-19ee-45f7-9269-d7c027a5d271.jpg",
+      category: "accessories",
+      description: "Официальная игровая шайба с логотипом. Коллекционная молодёжная команда. Идеальный сувенир."
+    },
+    {
+      id: 6,
       name: "Шарф болельщика (синий)",
       price: 1500,
       image: "https://cdn.poehali.dev/files/8dfe67f9-436f-4f07-97ef-eeaed8547e5f.jpg",
@@ -99,7 +103,7 @@ const Shop = () => {
       description: "Фанатский шарф в цветах команды Сибирские Снайперы."
     },
     {
-      id: 6,
+      id: 7,
       name: "Вымпел команды (синий)",
       price: 1200,
       image: "https://cdn.poehali.dev/files/29db9d33-8826-4926-8137-b51a4332b977.jpg",
@@ -107,7 +111,7 @@ const Shop = () => {
       description: "Официальный вымпел с логотипом. Синий цвет с белой бахромой."
     },
     {
-      id: 7,
+      id: 8,
       name: "Вымпел команды (голубой)",
       price: 1200,
       image: "https://cdn.poehali.dev/files/66332941-ba92-4144-8086-aff1bc66bb4b.jpg",
@@ -115,54 +119,12 @@ const Shop = () => {
       description: "Официальный вымпел с логотипом. Голубой цвет с белой бахромой."
     },
     {
-      id: 8,
+      id: 9,
       name: "Значок команды",
       price: 400,
       image: "https://cdn.poehali.dev/files/d57890bf-5a57-4480-9c91-61a71afce555.jpg",
       category: "accessories",
       description: "Коллекционный значок с логотипом. Металл с эмалью."
-    },
-    {
-      id: 9,
-      name: "Худи с логотипом",
-      price: 3200,
-      image: "https://cdn.poehali.dev/files/097edba3-4667-492c-8fdc-1be95663ce9e.png",
-      category: "apparel",
-      sizes: ["S", "M", "L", "XL", "XXL"],
-      description: "Удобная толстовка с капюшоном и большим логотипом команды."
-    },
-    {
-      id: 10,
-      name: "Футболка фанатская",
-      price: 1800,
-      image: "https://cdn.poehali.dev/files/097edba3-4667-492c-8fdc-1be95663ce9e.png",
-      category: "apparel",
-      sizes: ["S", "M", "L", "XL", "XXL"],
-      description: "Повседневная футболка с принтом команды. 100% хлопок."
-    },
-    {
-      id: 11,
-      name: "Шайба с логотипом",
-      price: 800,
-      image: "https://cdn.poehali.dev/files/5eafa8e1-7cd4-4959-927d-702849e9a9e9.jpg",
-      category: "accessories",
-      description: "Официальная игровая шайба с логотипом. Идеальный сувенир."
-    },
-    {
-      id: 12,
-      name: "Кепка с логотипом",
-      price: 1200,
-      image: "https://cdn.poehali.dev/files/097edba3-4667-492c-8fdc-1be95663ce9e.png",
-      category: "accessories",
-      description: "Стильная бейсболка с вышитым логотипом. Регулируемый размер."
-    },
-    {
-      id: 13,
-      name: "Термокружка",
-      price: 900,
-      image: "https://cdn.poehali.dev/files/097edba3-4667-492c-8fdc-1be95663ce9e.png",
-      category: "accessories",
-      description: "Термокружка с логотипом. Сохраняет температуру до 6 часов."
     }
   ];
 
@@ -278,6 +240,18 @@ const Shop = () => {
           alt="Логотип фон" 
           className="w-full h-full object-contain"
         />
+      </div>
+
+      <div className="fixed top-4 left-4 z-50">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => navigate("/admin")}
+          className="bg-white/90 hover:bg-white shadow-lg"
+        >
+          <Icon name="Settings" className="mr-2" size={16} />
+          Админ
+        </Button>
       </div>
 
       <div className="bg-primary text-white py-8 relative z-10">
