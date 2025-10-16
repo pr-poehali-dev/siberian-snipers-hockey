@@ -13,10 +13,10 @@ const Index = () => {
   const [positionFilter, setPositionFilter] = React.useState("all");
   const [searchQuery, setSearchQuery] = React.useState("");
 
-  const players: Array<{id: number; name: string; number: number; position: string; goals: number; assists: number; image: string; isCaptain?: boolean}> = [
+  const players: Array<{id: number; name: string; number: number; position: string; goals: number; assists: number; image: string; isCaptain?: boolean; isAssistant?: boolean}> = [
     { id: 1, name: "KRASOTKIN", number: 33, position: "Универсальный", goals: 0, assists: 0, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/01cb72fd-059f-42fa-a829-f343c951ff95.jpg", isCaptain: true },
-    { id: 2, name: "Lyzenkov", number: 86, position: "Универсальный", goals: 0, assists: 0, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/d0dc5e7d-fcae-4293-a50d-60cd61778d9a.jpg" },
-    { id: 3, name: "Zetka", number: 8, position: "Универсальный", goals: 0, assists: 0, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/54b0bb6d-95e0-40b1-9b51-b4510ea9889d.jpg" },
+    { id: 2, name: "Lyzenkov", number: 86, position: "Универсальный", goals: 0, assists: 0, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/d0dc5e7d-fcae-4293-a50d-60cd61778d9a.jpg", isAssistant: true },
+    { id: 3, name: "Zetka", number: 8, position: "Универсальный", goals: 0, assists: 0, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/54b0bb6d-95e0-40b1-9b51-b4510ea9889d.jpg", isAssistant: true },
     { id: 4, name: "Swafare", number: 91, position: "Универсальный", goals: 0, assists: 0, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/5285a795-21e8-4500-b4ea-3ca0d2e51f68.jpg" },
     { id: 5, name: "Mylnikov Nonprime", number: 20, position: "Вратарь", goals: 0, assists: 0, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/59f77c68-28c5-4974-a009-6a37500196d4.jpg" },
     { id: 6, name: "Bardakov", number: 26, position: "Универсальный", goals: 0, assists: 0, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/b44d808e-dcb2-47f8-86ca-38f9234e1d87.jpg" },
@@ -24,7 +24,7 @@ const Index = () => {
     { id: 8, name: "Martyska", number: 16, position: "Универсальный", goals: 0, assists: 0, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/21adbbc8-83a8-451f-85b8-1bdbc6849ede.jpg" },
     { id: 9, name: "Maksimka", number: 72, position: "Универсальный", goals: 0, assists: 0, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/9c4d93b4-56cc-4742-a055-9d0fb82ab3e9.jpg" },
     { id: 10, name: "Mishurov", number: 1, position: "Универсальный", goals: 0, assists: 0, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/099efe08-5f23-401d-b466-9b148166e3b9.jpg" },
-    { id: 11, name: "Danil", number: 11, position: "Универсальный", goals: 0, assists: 0, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/100e1e18-a675-41af-b1c4-4ee35fefb9fc.jpg" }
+    { id: 11, name: "kenzo", number: 10, position: "Универсальный", goals: 0, assists: 0, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/100e1e18-a675-41af-b1c4-4ee35fefb9fc.jpg", isAssistant: true }
   ];
 
   const matches: Array<{id: number; date: string; opponent: string; home: boolean; score: string; status: string}> = [
@@ -90,12 +90,13 @@ const Index = () => {
 
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="w-full grid grid-cols-5 mb-8 h-auto">
+          <TabsList className="w-full grid grid-cols-6 mb-8 h-auto">
             <TabsTrigger value="players" className="font-oswald text-sm py-4 px-4">ИГРОКИ</TabsTrigger>
             <TabsTrigger value="matches" className="font-oswald text-sm py-4 px-4">МАТЧИ</TabsTrigger>
             <TabsTrigger value="news" className="font-oswald text-sm py-4 px-4">НОВОСТИ</TabsTrigger>
             <TabsTrigger value="standings" className="font-oswald text-sm py-4 px-4 whitespace-normal">ТАБЛИЦА</TabsTrigger>
             <TabsTrigger value="management" className="font-oswald text-sm py-4 px-4">РУКОВОДСТВО</TabsTrigger>
+            <TabsTrigger value="shop" className="font-oswald text-sm py-4 px-4">МАГАЗИН</TabsTrigger>
           </TabsList>
 
           <TabsContent value="players" className="space-y-6 min-h-[400px]">
@@ -157,15 +158,20 @@ const Index = () => {
                       {player.number}
                     </div>
                     {player.isCaptain && (
-                      <div className="absolute top-4 left-4 bg-accent text-white px-3 py-1 rounded-full font-oswald text-sm font-bold shadow-lg">
+                      <div className="absolute top-4 left-4 bg-yellow-500 text-black px-3 py-1 rounded-full font-oswald text-sm font-bold shadow-lg">
                         C
+                      </div>
+                    )}
+                    {player.isAssistant && (
+                      <div className="absolute top-4 left-4 bg-blue-500 text-white px-3 py-1 rounded-full font-oswald text-sm font-bold shadow-lg">
+                        A
                       </div>
                     )}
                   </div>
                   <CardContent className="p-4">
                     <h3 className="font-oswald text-xl mb-2">{player.name}</h3>
                     <Badge variant="secondary" className="mb-3">{player.position}</Badge>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="grid grid-cols-2 gap-2 text-sm mb-3">
                       <div>
                         <p className="text-muted-foreground">Голы</p>
                         <p className="font-bold text-lg">{player.goals}</p>
@@ -175,6 +181,14 @@ const Index = () => {
                         <p className="font-bold text-lg">{player.assists}</p>
                       </div>
                     </div>
+                    <Button 
+                      className="w-full font-oswald" 
+                      size="sm"
+                      onClick={() => navigate(`/player/${player.id}`)}
+                    >
+                      <Icon name="BarChart" className="mr-2" size={16} />
+                      СТАТИСТИКА
+                    </Button>
                   </CardContent>
                 </Card>
               ))}
@@ -268,12 +282,17 @@ const Index = () => {
                 </Card>
               ))}
             </div>
-            {news.length === 0 && (
-              <div className="text-center py-16 text-muted-foreground">
-                <Icon name="Newspaper" size={64} className="mx-auto mb-4 opacity-30" />
-                <p className="text-xl font-oswald">СКОРО ЗДЕСЬ ПОЯВЯТСЯ НОВОСТИ</p>
-              </div>
-            )}
+            <div className="text-center mt-8">
+              <Button 
+                size="lg" 
+                variant="outline"
+                className="font-oswald text-lg px-8"
+                onClick={() => navigate("/news")}
+              >
+                <Icon name="Newspaper" className="mr-2" size={20} />
+                ВСЕ НОВОСТИ
+              </Button>
+            </div>
           </TabsContent>
 
           <TabsContent value="standings" className="space-y-6 min-h-[400px]">
@@ -317,6 +336,24 @@ const Index = () => {
                 <p className="text-xl font-oswald">СКОРО ЗДЕСЬ ПОЯВИТСЯ ТУРНИРНАЯ ТАБЛИЦА</p>
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="shop" className="min-h-[400px]">
+            <div className="text-center py-16">
+              <Icon name="ShoppingBag" size={64} className="mx-auto mb-4 text-primary" />
+              <h3 className="text-3xl font-oswald mb-4">МАГАЗИН АТРИБУТИКИ</h3>
+              <p className="text-lg text-muted-foreground mb-6">
+                Джерси, шайбы, аксессуары и другая официальная продукция команды
+              </p>
+              <Button 
+                size="lg" 
+                className="font-oswald text-lg px-8"
+                onClick={() => navigate("/shop")}
+              >
+                <Icon name="ShoppingCart" className="mr-2" size={20} />
+                ПЕРЕЙТИ В МАГАЗИН
+              </Button>
+            </div>
           </TabsContent>
 
           <TabsContent value="management" className="space-y-6 min-h-[400px]">
