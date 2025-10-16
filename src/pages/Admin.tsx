@@ -77,13 +77,65 @@ const Admin = () => {
     navigate("/");
   };
 
-  const handleUpdatePlayer = async () => {
+  const handleAddPlayer = () => {
+    const newPlayer: Player = {
+      id: 0,
+      name: "Новый игрок",
+      number: 0,
+      position: "Нападающий",
+      goals: 0,
+      assists: 0,
+      games_played: 0,
+      image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=400",
+      is_captain: false,
+      is_assistant: false,
+      height: "",
+      weight: "",
+      birth_date: "",
+      nationality: "Россия"
+    };
+    setEditingPlayer(newPlayer);
+    setIsPlayerDialogOpen(true);
+  };
+
+  const handleAddMatch = () => {
+    const newMatch: Match = {
+      id: 0,
+      date: new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' }),
+      opponent: "",
+      score: "",
+      status: "Скоро",
+      is_home: true
+    };
+    setEditingMatch(newMatch);
+    setIsMatchDialogOpen(true);
+  };
+
+  const handleAddNews = () => {
+    const newNews: NewsItem = {
+      id: 0,
+      title: "Новая новость",
+      date: new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }),
+      image: "https://images.unsplash.com/photo-1515703407324-5f753afd8be8?w=800",
+      excerpt: "",
+      content: ""
+    };
+    setEditingNews(newNews);
+    setIsNewsDialogOpen(true);
+  };
+
+  const handleSavePlayer = async () => {
     if (!editingPlayer) return;
     
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}?path=players/${editingPlayer.id}`, {
-        method: "PUT",
+      const isNewPlayer = editingPlayer.id === 0;
+      const url = isNewPlayer 
+        ? `${API_URL}?path=players`
+        : `${API_URL}?path=players/${editingPlayer.id}`;
+      
+      const response = await fetch(url, {
+        method: isNewPlayer ? "POST" : "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editingPlayer)
       });
@@ -92,22 +144,29 @@ const Admin = () => {
         await loadData();
         setIsPlayerDialogOpen(false);
         setEditingPlayer(null);
+      } else {
+        alert("Ошибка при сохранении игрока");
       }
     } catch (error) {
-      console.error("Failed to update player:", error);
-      alert("Ошибка при обновлении игрока");
+      console.error("Failed to save player:", error);
+      alert("Ошибка при сохранении игрока");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleUpdateMatch = async () => {
+  const handleSaveMatch = async () => {
     if (!editingMatch) return;
     
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}?path=matches/${editingMatch.id}`, {
-        method: "PUT",
+      const isNewMatch = editingMatch.id === 0;
+      const url = isNewMatch 
+        ? `${API_URL}?path=matches`
+        : `${API_URL}?path=matches/${editingMatch.id}`;
+      
+      const response = await fetch(url, {
+        method: isNewMatch ? "POST" : "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editingMatch)
       });
@@ -116,22 +175,29 @@ const Admin = () => {
         await loadData();
         setIsMatchDialogOpen(false);
         setEditingMatch(null);
+      } else {
+        alert("Ошибка при сохранении матча");
       }
     } catch (error) {
-      console.error("Failed to update match:", error);
-      alert("Ошибка при обновлении матча");
+      console.error("Failed to save match:", error);
+      alert("Ошибка при сохранении матча");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleUpdateNews = async () => {
+  const handleSaveNews = async () => {
     if (!editingNews) return;
     
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}?path=news/${editingNews.id}`, {
-        method: "PUT",
+      const isNewNews = editingNews.id === 0;
+      const url = isNewNews 
+        ? `${API_URL}?path=news`
+        : `${API_URL}?path=news/${editingNews.id}`;
+      
+      const response = await fetch(url, {
+        method: isNewNews ? "POST" : "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editingNews)
       });
@@ -140,10 +206,78 @@ const Admin = () => {
         await loadData();
         setIsNewsDialogOpen(false);
         setEditingNews(null);
+      } else {
+        alert("Ошибка при сохранении новости");
       }
     } catch (error) {
-      console.error("Failed to update news:", error);
-      alert("Ошибка при обновлении новости");
+      console.error("Failed to save news:", error);
+      alert("Ошибка при сохранении новости");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeletePlayer = async (id: number) => {
+    if (!confirm("Вы уверены, что хотите удалить этого игрока?")) return;
+    
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}?path=players/${id}`, {
+        method: "DELETE"
+      });
+
+      if (response.ok) {
+        await loadData();
+      } else {
+        alert("Ошибка при удалении игрока");
+      }
+    } catch (error) {
+      console.error("Failed to delete player:", error);
+      alert("Ошибка при удалении игрока");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteMatch = async (id: number) => {
+    if (!confirm("Вы уверены, что хотите удалить этот матч?")) return;
+    
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}?path=matches/${id}`, {
+        method: "DELETE"
+      });
+
+      if (response.ok) {
+        await loadData();
+      } else {
+        alert("Ошибка при удалении матча");
+      }
+    } catch (error) {
+      console.error("Failed to delete match:", error);
+      alert("Ошибка при удалении матча");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteNews = async (id: number) => {
+    if (!confirm("Вы уверены, что хотите удалить эту новость?")) return;
+    
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}?path=news/${id}`, {
+        method: "DELETE"
+      });
+
+      if (response.ok) {
+        await loadData();
+      } else {
+        alert("Ошибка при удалении новости");
+      }
+    } catch (error) {
+      console.error("Failed to delete news:", error);
+      alert("Ошибка при удалении новости");
     } finally {
       setLoading(false);
     }
@@ -229,24 +363,54 @@ const Admin = () => {
         )}
 
         {!loading && activeSection === "players" && (
-          <PlayersSection
-            players={players}
-            onEditPlayer={handleEditPlayer}
-          />
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-oswald font-bold">Управление игроками</h2>
+              <Button onClick={handleAddPlayer}>
+                <Icon name="Plus" className="mr-2" size={20} />
+                Добавить игрока
+              </Button>
+            </div>
+            <PlayersSection
+              players={players}
+              onEditPlayer={handleEditPlayer}
+              onDeletePlayer={handleDeletePlayer}
+            />
+          </div>
         )}
 
         {!loading && activeSection === "matches" && (
-          <MatchesSection
-            matches={matches}
-            onEditMatch={handleEditMatch}
-          />
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-oswald font-bold">Управление матчами</h2>
+              <Button onClick={handleAddMatch}>
+                <Icon name="Plus" className="mr-2" size={20} />
+                Добавить матч
+              </Button>
+            </div>
+            <MatchesSection
+              matches={matches}
+              onEditMatch={handleEditMatch}
+              onDeleteMatch={handleDeleteMatch}
+            />
+          </div>
         )}
 
         {!loading && activeSection === "news" && (
-          <NewsSection
-            news={news}
-            onEditNews={handleEditNews}
-          />
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-oswald font-bold">Управление новостями</h2>
+              <Button onClick={handleAddNews}>
+                <Icon name="Plus" className="mr-2" size={20} />
+                Добавить новость
+              </Button>
+            </div>
+            <NewsSection
+              news={news}
+              onEditNews={handleEditNews}
+              onDeleteNews={handleDeleteNews}
+            />
+          </div>
         )}
 
         <PlayerEditDialog
@@ -254,7 +418,7 @@ const Admin = () => {
           onClose={() => setIsPlayerDialogOpen(false)}
           player={editingPlayer}
           onPlayerChange={setEditingPlayer}
-          onSave={handleUpdatePlayer}
+          onSave={handleSavePlayer}
           loading={loading}
         />
 
@@ -263,7 +427,7 @@ const Admin = () => {
           onClose={() => setIsMatchDialogOpen(false)}
           match={editingMatch}
           onMatchChange={setEditingMatch}
-          onSave={handleUpdateMatch}
+          onSave={handleSaveMatch}
           loading={loading}
         />
 
@@ -272,7 +436,7 @@ const Admin = () => {
           onClose={() => setIsNewsDialogOpen(false)}
           news={editingNews}
           onNewsChange={setEditingNews}
-          onSave={handleUpdateNews}
+          onSave={handleSaveNews}
           loading={loading}
         />
       </div>

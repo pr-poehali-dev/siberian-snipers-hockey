@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import Icon from "@/components/ui/icon";
 
-const API_URL = "https://functions.poehali.dev/90140830-0c8d-4493-bfe2-be85f46b2961";
+const API_URL = "https://functions.poehali.dev/dcf34c35-43e9-4e43-ad3a-efbf8f2d3ec2";
 
 interface Player {
   id: number;
