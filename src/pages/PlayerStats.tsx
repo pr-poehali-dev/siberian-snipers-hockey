@@ -319,19 +319,19 @@ const PlayerStats = () => {
               <div className="space-y-3">
                 <div className="flex justify-between border-b pb-2">
                   <span className="font-oswald">Рост:</span>
-                  <span className="font-bold">{player.height}</span>
+                  <span className="font-bold">{player.height || '-'}</span>
                 </div>
                 <div className="flex justify-between border-b pb-2">
                   <span className="font-oswald">Вес:</span>
-                  <span className="font-bold">{player.weight}</span>
+                  <span className="font-bold">{player.weight || '-'}</span>
                 </div>
                 <div className="flex justify-between border-b pb-2">
                   <span className="font-oswald">Дата рождения:</span>
-                  <span className="font-bold">{player.birthDate}</span>
+                  <span className="font-bold">{player.birthDate || '-'}</span>
                 </div>
                 <div className="flex justify-between border-b pb-2">
                   <span className="font-oswald">Гражданство:</span>
-                  <span className="font-bold">{player.nationality}</span>
+                  <span className="font-bold">{player.nationality || '-'}</span>
                 </div>
               </div>
             </CardContent>
@@ -346,22 +346,22 @@ const PlayerStats = () => {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                   <div className="text-center p-4 bg-primary/10 rounded-lg">
                     <Icon name="Target" className="mx-auto mb-2 text-primary" size={32} />
-                    <div className="text-4xl font-bold text-primary">{player.goals}</div>
+                    <div className="text-4xl font-bold text-primary">{player.goals || '-'}</div>
                     <div className="text-sm font-oswald text-muted-foreground">ГОЛЫ</div>
                   </div>
                   <div className="text-center p-4 bg-accent/10 rounded-lg">
                     <Icon name="Users" className="mx-auto mb-2 text-accent" size={32} />
-                    <div className="text-4xl font-bold text-accent">{player.assists}</div>
+                    <div className="text-4xl font-bold text-accent">{player.assists || '-'}</div>
                     <div className="text-sm font-oswald text-muted-foreground">ПЕРЕДАЧИ</div>
                   </div>
                   <div className="text-center p-4 bg-blue-500/10 rounded-lg">
                     <Icon name="TrendingUp" className="mx-auto mb-2 text-blue-500" size={32} />
-                    <div className="text-4xl font-bold text-blue-500">{totalPoints}</div>
+                    <div className="text-4xl font-bold text-blue-500">{totalPoints || '-'}</div>
                     <div className="text-sm font-oswald text-muted-foreground">ОЧКИ</div>
                   </div>
                   <div className="text-center p-4 bg-green-500/10 rounded-lg">
                     <Icon name="Calendar" className="mx-auto mb-2 text-green-500" size={32} />
-                    <div className="text-4xl font-bold text-green-500">{player.gamesPlayed}</div>
+                    <div className="text-4xl font-bold text-green-500">{player.gamesPlayed || '-'}</div>
                     <div className="text-sm font-oswald text-muted-foreground">МАТЧИ</div>
                   </div>
                 </div>

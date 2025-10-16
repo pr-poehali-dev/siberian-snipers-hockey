@@ -14,17 +14,17 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = React.useState("");
 
   const players: Array<{id: number; name: string; number: number; position: string; goals: number; assists: number; image: string; isCaptain?: boolean; isAssistant?: boolean}> = [
-    { id: 1, name: "KRASOTKIN", number: 33, position: "Универсальный", goals: 0, assists: 0, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/01cb72fd-059f-42fa-a829-f343c951ff95.jpg", isCaptain: true },
-    { id: 2, name: "Lyzenkov", number: 86, position: "Универсальный", goals: 0, assists: 0, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/d0dc5e7d-fcae-4293-a50d-60cd61778d9a.jpg", isAssistant: true },
-    { id: 3, name: "Zetka", number: 8, position: "Универсальный", goals: 0, assists: 0, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/54b0bb6d-95e0-40b1-9b51-b4510ea9889d.jpg", isAssistant: true },
-    { id: 4, name: "Swafare", number: 91, position: "Универсальный", goals: 0, assists: 0, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/5285a795-21e8-4500-b4ea-3ca0d2e51f68.jpg" },
-    { id: 5, name: "Mylnikov Nonprime", number: 20, position: "Вратарь", goals: 0, assists: 0, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/59f77c68-28c5-4974-a009-6a37500196d4.jpg" },
-    { id: 6, name: "Bardakov", number: 26, position: "Универсальный", goals: 0, assists: 0, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/b44d808e-dcb2-47f8-86ca-38f9234e1d87.jpg" },
-    { id: 7, name: "Bobrovskiy", number: 88, position: "Вратарь", goals: 0, assists: 0, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/c6acb1cf-21bd-44d2-aae0-49739fbf1c9a.jpg" },
-    { id: 8, name: "Martyska", number: 16, position: "Универсальный", goals: 0, assists: 0, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/21adbbc8-83a8-451f-85b8-1bdbc6849ede.jpg" },
-    { id: 9, name: "Maksimka", number: 72, position: "Универсальный", goals: 0, assists: 0, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/9c4d93b4-56cc-4742-a055-9d0fb82ab3e9.jpg" },
-    { id: 10, name: "Mishurov", number: 1, position: "Универсальный", goals: 0, assists: 0, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/099efe08-5f23-401d-b466-9b148166e3b9.jpg" },
-    { id: 11, name: "kenzo", number: 10, position: "Универсальный", goals: 0, assists: 0, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/100e1e18-a675-41af-b1c4-4ee35fefb9fc.jpg" }
+    { id: 1, name: "KRASOTKIN", number: 33, position: "Универсальный", goals: 12, assists: 18, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/01cb72fd-059f-42fa-a829-f343c951ff95.jpg", isCaptain: true },
+    { id: 2, name: "Lyzenkov", number: 86, position: "Универсальный", goals: 8, assists: 15, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/d0dc5e7d-fcae-4293-a50d-60cd61778d9a.jpg", isAssistant: true },
+    { id: 3, name: "Zetka", number: 8, position: "Универсальный", goals: 15, assists: 12, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/54b0bb6d-95e0-40b1-9b51-b4510ea9889d.jpg", isAssistant: true },
+    { id: 4, name: "Swafare", number: 91, position: "Универсальный", goals: 10, assists: 14, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/5285a795-21e8-4500-b4ea-3ca0d2e51f68.jpg" },
+    { id: 5, name: "Mylnikov Nonprime", number: 20, position: "Вратарь", goals: 0, assists: 2, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/59f77c68-28c5-4974-a009-6a37500196d4.jpg" },
+    { id: 6, name: "Bardakov", number: 26, position: "Универсальный", goals: 6, assists: 9, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/b44d808e-dcb2-47f8-86ca-38f9234e1d87.jpg" },
+    { id: 7, name: "Bobrovskiy", number: 88, position: "Вратарь", goals: 0, assists: 1, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/c6acb1cf-21bd-44d2-aae0-49739fbf1c9a.jpg" },
+    { id: 8, name: "Martyska", number: 16, position: "Универсальный", goals: 7, assists: 11, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/21adbbc8-83a8-451f-85b8-1bdbc6849ede.jpg" },
+    { id: 9, name: "Maksimka", number: 72, position: "Универсальный", goals: 9, assists: 10, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/9c4d93b4-56cc-4742-a055-9d0fb82ab3e9.jpg" },
+    { id: 10, name: "Mishurov", number: 1, position: "Универсальный", goals: 5, assists: 8, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/099efe08-5f23-401d-b466-9b148166e3b9.jpg" },
+    { id: 11, name: "kenzo", number: 10, position: "Универсальный", goals: 18, assists: 20, image: "https://cdn.poehali.dev/projects/0c3ad395-4537-4b63-bf7d-d0e32adf7baf/files/100e1e18-a675-41af-b1c4-4ee35fefb9fc.jpg", isAssistant: true }
   ];
 
   const matches: Array<{id: number; date: string; opponent: string; home: boolean; score: string; status: string}> = [
@@ -193,11 +193,11 @@ const Index = () => {
                     <div className="grid grid-cols-2 gap-2 text-sm mb-3">
                       <div>
                         <p className="text-muted-foreground">Голы</p>
-                        <p className="font-bold text-lg">{player.goals}</p>
+                        <p className="font-bold text-lg">{player.goals || '-'}</p>
                       </div>
                       <div>
                         <p className="text-muted-foreground">Передачи</p>
-                        <p className="font-bold text-lg">{player.assists}</p>
+                        <p className="font-bold text-lg">{player.assists || '-'}</p>
                       </div>
                     </div>
                     <Button 
