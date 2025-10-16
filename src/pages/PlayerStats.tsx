@@ -125,9 +125,9 @@ const PlayerStats = () => {
       nationality: "Россия",
       gamesPlayed: 15,
       penaltyMinutes: 2,
-      plusMinus: 0,
-      shots: 0,
-      shotPercentage: 0,
+      plusMinus: -3,
+      shots: 5,
+      shotPercentage: 0.1,
       avgTimeOnIce: "60:00"
     },
     { 
@@ -162,10 +162,10 @@ const PlayerStats = () => {
       birthDate: "12.06.1999",
       nationality: "Россия",
       gamesPlayed: 9,
-      penaltyMinutes: 0,
-      plusMinus: 0,
-      shots: 0,
-      shotPercentage: 0,
+      penaltyMinutes: 2,
+      plusMinus: -2,
+      shots: 3,
+      shotPercentage: 0.1,
       avgTimeOnIce: "60:00"
     },
     { 
@@ -380,11 +380,11 @@ const PlayerStats = () => {
                   </div>
                   <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
                     <span className="font-oswald">Броски по воротам</span>
-                    <span className="text-xl font-bold">{player.shots}</span>
+                    <span className="text-xl font-bold">{player.shots || '-'}</span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
                     <span className="font-oswald">% реализации бросков</span>
-                    <span className="text-xl font-bold">{player.shotPercentage}%</span>
+                    <span className="text-xl font-bold">{player.shotPercentage > 0 ? `${player.shotPercentage}%` : '-'}</span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
                     <span className="font-oswald">Плюс/минус</span>
@@ -394,7 +394,7 @@ const PlayerStats = () => {
                   </div>
                   <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
                     <span className="font-oswald">Штрафное время</span>
-                    <span className="text-xl font-bold">{player.penaltyMinutes} мин</span>
+                    <span className="text-xl font-bold">{player.penaltyMinutes > 0 ? `${player.penaltyMinutes} мин` : '-'}</span>
                   </div>
                 </div>
               </CardContent>

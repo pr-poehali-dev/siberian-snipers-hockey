@@ -2,20 +2,10 @@ import { Product } from "./types";
 
 export const products: Product[] = [
   {
-    id: 1,
-    name: "Джерси (Белое)",
-    price: 5500,
-    image: "https://cdn.poehali.dev/files/6e931c08-0d32-4672-87d9-591ac87907ab.jpg",
-    category: "jerseys",
-    sizes: ["S", "M", "L", "XL", "XXL"],
-    customizable: true,
-    description: "Белое игровое джерси. Кастомизация: ваша фамилия и номер."
-  },
-  {
     id: 2,
     name: "Джерси (Синее)",
     price: 5500,
-    image: "https://cdn.poehali.dev/files/6e931c08-0d32-4672-87d9-591ac87907ab.jpg",
+    image: "https://cdn.poehali.dev/files/460cf623-3d02-4e8c-8b18-10564a787e8e.png",
     category: "jerseys",
     sizes: ["S", "M", "L", "XL", "XXL"],
     customizable: true,
