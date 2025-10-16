@@ -72,7 +72,7 @@ const CheckoutDialog = ({
                 <div>
                   <Label>Имя *</Label>
                   <Input
-                    value={formData.firstName}
+                    value={formData.firstName || ""}
                     onChange={(e) => onFormChange("firstName", e.target.value)}
                     placeholder="Иван"
                   />
@@ -80,7 +80,7 @@ const CheckoutDialog = ({
                 <div>
                   <Label>Фамилия *</Label>
                   <Input
-                    value={formData.lastName}
+                    value={formData.lastName || ""}
                     onChange={(e) => onFormChange("lastName", e.target.value)}
                     placeholder="Иванов"
                   />
@@ -91,7 +91,7 @@ const CheckoutDialog = ({
                 <Label>Email *</Label>
                 <Input
                   type="email"
-                  value={formData.email}
+                  value={formData.email || ""}
                   onChange={(e) => onFormChange("email", e.target.value)}
                   placeholder="example@mail.com"
                 />
@@ -101,7 +101,7 @@ const CheckoutDialog = ({
                 <Label>Телефон *</Label>
                 <Input
                   type="tel"
-                  value={formData.phone}
+                  value={formData.phone || ""}
                   onChange={(e) => onFormChange("phone", e.target.value)}
                   placeholder="89001234567"
                 />
@@ -110,7 +110,7 @@ const CheckoutDialog = ({
               <div>
                 <Label>Адрес доставки *</Label>
                 <Input
-                  value={formData.address}
+                  value={formData.address || ""}
                   onChange={(e) => onFormChange("address", e.target.value)}
                   placeholder="г. Москва, ул. Ленина, д. 1, кв. 1"
                 />
@@ -119,7 +119,7 @@ const CheckoutDialog = ({
               <div>
                 <Label>Номер карты *</Label>
                 <Input
-                  value={formData.cardNumber}
+                  value={formData.cardNumber || ""}
                   onChange={(e) => onFormChange("cardNumber", e.target.value)}
                   placeholder="1234 5678 9012 3456"
                   maxLength={16}
