@@ -90,11 +90,12 @@ const Index = () => {
 
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="w-full grid grid-cols-4 mb-8 h-auto">
+          <TabsList className="w-full grid grid-cols-5 mb-8 h-auto">
             <TabsTrigger value="players" className="font-oswald text-sm py-4 px-2">ИГРОКИ</TabsTrigger>
             <TabsTrigger value="matches" className="font-oswald text-sm py-4 px-2">МАТЧИ</TabsTrigger>
             <TabsTrigger value="news" className="font-oswald text-sm py-4 px-2">НОВОСТИ</TabsTrigger>
             <TabsTrigger value="standings" className="font-oswald text-sm py-4 px-2">ТАБЛИЦА</TabsTrigger>
+            <TabsTrigger value="shop" className="font-oswald text-sm py-4 px-2">МАГАЗИН</TabsTrigger>
           </TabsList>
 
           <TabsContent value="players" className="space-y-6 min-h-[400px]">
