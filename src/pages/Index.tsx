@@ -46,6 +46,7 @@ const Index = () => {
   const [players, setPlayers] = React.useState<Player[]>([]);
   const [matches, setMatches] = React.useState<Match[]>([]);
   const [news, setNews] = React.useState<NewsItem[]>([]);
+  const [standings, setStandings] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
@@ -54,27 +55,28 @@ const Index = () => {
 
   const loadData = async () => {
     try {
-      const [playersRes, matchesRes, newsRes] = await Promise.all([
+      const [playersRes, matchesRes, newsRes, standingsRes] = await Promise.all([
         fetch(`${API_URL}?path=players`),
         fetch(`${API_URL}?path=matches`),
-        fetch(`${API_URL}?path=news`)
+        fetch(`${API_URL}?path=news`),
+        fetch(`${API_URL}?path=standings`)
       ]);
 
       const playersData = await playersRes.json();
       const matchesData = await matchesRes.json();
       const newsData = await newsRes.json();
+      const standingsData = await standingsRes.json();
 
       setPlayers(playersData.players || []);
       setMatches(matchesData.matches || []);
       setNews(newsData.news || []);
+      setStandings(standingsData.standings || []);
     } catch (error) {
       console.error("Failed to load data:", error);
     } finally {
       setLoading(false);
     }
   };
-
-  const standings: Array<{place: number; team: string; games: number; wins: number; losses: number; points: number}> = [];
 
   const management: Array<{name: string; position: string; experience: string}> = [];
 

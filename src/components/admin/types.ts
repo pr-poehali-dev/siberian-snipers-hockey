@@ -43,4 +43,15 @@ export interface Stream {
   thumbnail?: string;
 }
 
+export interface Standing {
+  id: number;
+  place: number;
+  team: string;
+  games: number;
+  wins: number;
+  losses: number;
+  points: number;
+  logo?: string;
+}
+
 export const API_URL = "https://functions.poehali.dev/90140830-0c8d-4493-bfe2-be85f46b2961";

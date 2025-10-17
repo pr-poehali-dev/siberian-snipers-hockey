@@ -11,7 +11,8 @@ import PlayerEditDialog from "@/components/admin/PlayerEditDialog";
 import MatchEditDialog from "@/components/admin/MatchEditDialog";
 import NewsEditDialog from "@/components/admin/NewsEditDialog";
 import StreamEditDialog from "@/components/admin/StreamEditDialog";
-import { Player, Match, NewsItem, Stream, API_URL } from "@/components/admin/types";
+import StandingEditDialog from "@/components/admin/StandingEditDialog";
+import { Player, Match, NewsItem, Stream, Standing, API_URL } from "@/components/admin/types";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -24,16 +25,19 @@ const Admin = () => {
   const [matches, setMatches] = React.useState<Match[]>([]);
   const [news, setNews] = React.useState<NewsItem[]>([]);
   const [streams, setStreams] = React.useState<Stream[]>([]);
+  const [standings, setStandings] = React.useState<Standing[]>([]);
 
   const [editingPlayer, setEditingPlayer] = React.useState<Player | null>(null);
   const [editingMatch, setEditingMatch] = React.useState<Match | null>(null);
   const [editingNews, setEditingNews] = React.useState<NewsItem | null>(null);
   const [editingStream, setEditingStream] = React.useState<Stream | null>(null);
+  const [editingStanding, setEditingStanding] = React.useState<Standing | null>(null);
 
   const [isPlayerDialogOpen, setIsPlayerDialogOpen] = React.useState(false);
   const [isMatchDialogOpen, setIsMatchDialogOpen] = React.useState(false);
   const [isNewsDialogOpen, setIsNewsDialogOpen] = React.useState(false);
   const [isStreamDialogOpen, setIsStreamDialogOpen] = React.useState(false);
+  const [isStandingDialogOpen, setIsStandingDialogOpen] = React.useState(false);
 
   React.useEffect(() => {
     const auth = localStorage.getItem("admin_auth");
@@ -46,22 +50,25 @@ const Admin = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [playersRes, matchesRes, newsRes, streamsRes] = await Promise.all([
+      const [playersRes, matchesRes, newsRes, streamsRes, standingsRes] = await Promise.all([
         fetch(`${API_URL}?path=players`),
         fetch(`${API_URL}?path=matches`),
         fetch(`${API_URL}?path=news`),
-        fetch(`${API_URL}?path=streams`)
+        fetch(`${API_URL}?path=streams`),
+        fetch(`${API_URL}?path=standings`)
       ]);
 
       const playersData = await playersRes.json();
       const matchesData = await matchesRes.json();
       const newsData = await newsRes.json();
       const streamsData = await streamsRes.json();
+      const standingsData = await standingsRes.json();
 
       setPlayers(playersData.players || []);
       setMatches(matchesData.matches || []);
       setNews(newsData.news || []);
       setStreams(streamsData.streams || []);
+      setStandings(standingsData.standings || []);
     } catch (error) {
       console.error("Failed to load data:", error);
     } finally {
@@ -375,6 +382,76 @@ const Admin = () => {
     }
   };
 
+  const handleAddStanding = () => {
+    const newStanding: Standing = {
+      id: 0,
+      place: standings.length + 1,
+      team: "Новая команда",
+      games: 0,
+      wins: 0,
+      losses: 0,
+      points: 0
+    };
+    setEditingStanding(newStanding);
+    setIsStandingDialogOpen(true);
+  };
+
+  const handleEditStanding = (standing: Standing) => {
+    setEditingStanding(standing);
+    setIsStandingDialogOpen(true);
+  };
+
+  const handleSaveStanding = async () => {
+    if (!editingStanding) return;
+
+    setLoading(true);
+    try {
+      const isNewStanding = editingStanding.id === 0;
+      const path = isNewStanding ? "standings" : `standings/${editingStanding.id}`;
+
+      const response = await fetch(`${API_URL}?path=${path}`, {
+        method: isNewStanding ? "POST" : "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editingStanding)
+      });
+
+      if (response.ok) {
+        await loadData();
+        setIsStandingDialogOpen(false);
+        setEditingStanding(null);
+      } else {
+        alert("Ошибка при сохранении команды");
+      }
+    } catch (error) {
+      console.error("Failed to save standing:", error);
+      alert("Ошибка при сохранении команды");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteStanding = async (id: number) => {
+    if (!confirm("Вы уверены, что хотите удалить эту команду?")) return;
+    
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}?path=standings/${id}`, {
+        method: "DELETE"
+      });
+
+      if (response.ok) {
+        await loadData();
+      } else {
+        alert("Ошибка при удалении команды");
+      }
+    } catch (error) {
+      console.error("Failed to delete standing:", error);
+      alert("Ошибка при удалении команды");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (!isAuthenticated) {
     return (
       <AdminLogin
@@ -441,6 +518,14 @@ const Admin = () => {
           >
             <Icon name="Video" className="mr-2" size={20} />
             ТРАНСЛЯЦИИ
+          </Button>
+          <Button
+            onClick={() => setActiveSection("standings")}
+            variant={activeSection === "standings" ? "default" : "outline"}
+            className="font-oswald"
+          >
+            <Icon name="Trophy" className="mr-2" size={20} />
+            ТАБЛИЦА
           </Button>
         </div>
 
@@ -556,6 +641,71 @@ const Admin = () => {
           </div>
         )}
 
+        {!loading && activeSection === "standings" && (
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-oswald font-bold">Управление турнирной таблицей</h2>
+              <Button onClick={handleAddStanding}>
+                <Icon name="Plus" className="mr-2" size={20} />
+                Добавить команду
+              </Button>
+            </div>
+            <Card>
+              <CardContent className="p-0">
+                <table className="w-full">
+                  <thead className="bg-primary text-white">
+                    <tr>
+                      <th className="p-4 text-left font-oswald">МЕСТО</th>
+                      <th className="p-4 text-left font-oswald">КОМАНДА</th>
+                      <th className="p-4 text-center font-oswald">И</th>
+                      <th className="p-4 text-center font-oswald">В</th>
+                      <th className="p-4 text-center font-oswald">П</th>
+                      <th className="p-4 text-center font-oswald">ОЧКИ</th>
+                      <th className="p-4 text-center font-oswald">ДЕЙСТВИЯ</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {standings.map((standing) => (
+                      <tr key={standing.id} className="border-b hover:bg-muted/50">
+                        <td className="p-4 font-bold">{standing.place}</td>
+                        <td className="p-4 font-oswald text-lg">{standing.team}</td>
+                        <td className="p-4 text-center">{standing.games}</td>
+                        <td className="p-4 text-center font-bold">{standing.wins}</td>
+                        <td className="p-4 text-center">{standing.losses}</td>
+                        <td className="p-4 text-center font-bold text-lg">{standing.points}</td>
+                        <td className="p-4 text-center">
+                          <div className="flex gap-2 justify-center">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEditStanding(standing)}
+                            >
+                              <Icon name="Pencil" size={16} />
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => handleDeleteStanding(standing.id)}
+                            >
+                              <Icon name="Trash2" size={16} />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {standings.length === 0 && (
+                  <div className="p-12 text-center">
+                    <Icon name="Trophy" size={48} className="mx-auto mb-4 opacity-30" />
+                    <p className="text-muted-foreground">Команд пока нет</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         <PlayerEditDialog
           isOpen={isPlayerDialogOpen}
           onClose={() => setIsPlayerDialogOpen(false)}
@@ -589,6 +739,15 @@ const Admin = () => {
           stream={editingStream}
           onStreamChange={setEditingStream}
           onSave={handleSaveStream}
+          loading={loading}
+        />
+
+        <StandingEditDialog
+          isOpen={isStandingDialogOpen}
+          onClose={() => setIsStandingDialogOpen(false)}
+          standing={editingStanding}
+          onStandingChange={setEditingStanding}
+          onSave={handleSaveStanding}
           loading={loading}
         />
       </div>

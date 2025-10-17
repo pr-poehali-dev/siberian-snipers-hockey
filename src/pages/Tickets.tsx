@@ -52,10 +52,9 @@ const Tickets = () => {
     try {
       const response = await fetch(`${API_URL}?path=matches`);
       const data = await response.json();
-      const upcomingMatches = data.matches.filter((m: any) => m.status === 'upcoming');
-      setMatches(upcomingMatches || []);
-      if (upcomingMatches.length > 0) {
-        setSelectedMatch(upcomingMatches[0]);
+      setMatches(data.matches || []);
+      if (data.matches && data.matches.length > 0) {
+        setSelectedMatch(data.matches[0]);
       }
     } catch (error) {
       console.error("Failed to load matches:", error);

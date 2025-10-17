@@ -77,6 +77,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             elif path == 'streams':
                 cur.execute('SELECT * FROM streams ORDER BY scheduled_time DESC')
                 return {'statusCode': 200, 'headers': cors_headers, 'body': json.dumps({'streams': cur.fetchall()}, default=str)}
+            
+            elif path == 'standings':
+                cur.execute('SELECT * FROM standings ORDER BY place')
+                return {'statusCode': 200, 'headers': cors_headers, 'body': json.dumps({'standings': cur.fetchall()}, default=str)}
         
         elif method == 'POST':
             body_data = json.loads(event.get('body', '{}'))
@@ -147,6 +151,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 )
                 conn.commit()
                 return {'statusCode': 201, 'headers': cors_headers, 'body': json.dumps({'stream': cur.fetchone()}, default=str)}
+            
+            elif path == 'standings':
+                cur.execute(
+                    'INSERT INTO standings (place, team, games, wins, losses, points, logo) VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING *',
+                    (body_data['place'], body_data['team'], body_data.get('games', 0), body_data.get('wins', 0), body_data.get('losses', 0), body_data.get('points', 0), body_data.get('logo'))
+                )
+                conn.commit()
+                return {'statusCode': 201, 'headers': cors_headers, 'body': json.dumps({'standing': cur.fetchone()}, default=str)}
         
         elif method == 'PUT':
             body_data = json.loads(event.get('body', '{}'))
@@ -182,6 +194,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 cur.execute(f'UPDATE streams SET {", ".join(fields)} WHERE id = %s', tuple(values))
                 conn.commit()
                 return {'statusCode': 200, 'headers': cors_headers, 'body': json.dumps({'success': True})}
+            
+            elif path.startswith('standings/'):
+                standing_id = path.split('/')[-1]
+                fields = [f'{k} = %s' for k in body_data if k != 'id']
+                values = [v for k, v in body_data.items() if k != 'id'] + [standing_id]
+                cur.execute(f'UPDATE standings SET {", ".join(fields)} WHERE id = %s', tuple(values))
+                conn.commit()
+                return {'statusCode': 200, 'headers': cors_headers, 'body': json.dumps({'success': True})}
         
         elif method == 'DELETE':
             if path.startswith('players/'):
@@ -206,6 +226,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             elif path.startswith('streams/'):
                 cur.execute('DELETE FROM streams WHERE id = %s', (path.split('/')[-1],))
+                conn.commit()
+                return {'statusCode': 200, 'headers': cors_headers, 'body': json.dumps({'success': True})}
+            
+            elif path.startswith('standings/'):
+                cur.execute('DELETE FROM standings WHERE id = %s', (path.split('/')[-1],))
                 conn.commit()
                 return {'statusCode': 200, 'headers': cors_headers, 'body': json.dumps({'success': True})}
         
