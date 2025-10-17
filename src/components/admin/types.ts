@@ -33,4 +33,14 @@ export interface NewsItem {
   content?: string;
 }
 
-export const API_URL = "https://functions.poehali.dev/dcf34c35-43e9-4e43-ad3a-efbf8f2d3ec2";
+export interface Stream {
+  id: number;
+  match_id?: number;
+  title: string;
+  stream_url: string;
+  status: string;
+  scheduled_time: string;
+  thumbnail?: string;
+}
+
+export const API_URL = "https://functions.poehali.dev/90140830-0c8d-4493-bfe2-be85f46b2961";

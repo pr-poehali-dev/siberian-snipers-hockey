@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import Icon from "@/components/ui/icon";
 import AdminLogin from "@/components/admin/AdminLogin";
 import PlayersSection from "@/components/admin/PlayersSection";
@@ -9,7 +10,8 @@ import NewsSection from "@/components/admin/NewsSection";
 import PlayerEditDialog from "@/components/admin/PlayerEditDialog";
 import MatchEditDialog from "@/components/admin/MatchEditDialog";
 import NewsEditDialog from "@/components/admin/NewsEditDialog";
-import { Player, Match, NewsItem, API_URL } from "@/components/admin/types";
+import StreamEditDialog from "@/components/admin/StreamEditDialog";
+import { Player, Match, NewsItem, Stream, API_URL } from "@/components/admin/types";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -21,14 +23,17 @@ const Admin = () => {
   const [players, setPlayers] = React.useState<Player[]>([]);
   const [matches, setMatches] = React.useState<Match[]>([]);
   const [news, setNews] = React.useState<NewsItem[]>([]);
+  const [streams, setStreams] = React.useState<Stream[]>([]);
 
   const [editingPlayer, setEditingPlayer] = React.useState<Player | null>(null);
   const [editingMatch, setEditingMatch] = React.useState<Match | null>(null);
   const [editingNews, setEditingNews] = React.useState<NewsItem | null>(null);
+  const [editingStream, setEditingStream] = React.useState<Stream | null>(null);
 
   const [isPlayerDialogOpen, setIsPlayerDialogOpen] = React.useState(false);
   const [isMatchDialogOpen, setIsMatchDialogOpen] = React.useState(false);
   const [isNewsDialogOpen, setIsNewsDialogOpen] = React.useState(false);
+  const [isStreamDialogOpen, setIsStreamDialogOpen] = React.useState(false);
 
   React.useEffect(() => {
     const auth = localStorage.getItem("admin_auth");
@@ -41,19 +46,22 @@ const Admin = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [playersRes, matchesRes, newsRes] = await Promise.all([
+      const [playersRes, matchesRes, newsRes, streamsRes] = await Promise.all([
         fetch(`${API_URL}?path=players`),
         fetch(`${API_URL}?path=matches`),
-        fetch(`${API_URL}?path=news`)
+        fetch(`${API_URL}?path=news`),
+        fetch(`${API_URL}?path=streams`)
       ]);
 
       const playersData = await playersRes.json();
       const matchesData = await matchesRes.json();
       const newsData = await newsRes.json();
+      const streamsData = await streamsRes.json();
 
       setPlayers(playersData.players || []);
       setMatches(matchesData.matches || []);
       setNews(newsData.news || []);
+      setStreams(streamsData.streams || []);
     } catch (error) {
       console.error("Failed to load data:", error);
     } finally {
@@ -298,6 +306,75 @@ const Admin = () => {
     setIsNewsDialogOpen(true);
   };
 
+  const handleAddStream = () => {
+    const newStream: Stream = {
+      id: 0,
+      title: "Новая трансляция",
+      stream_url: "",
+      status: "scheduled",
+      scheduled_time: new Date().toISOString(),
+      thumbnail: ""
+    };
+    setEditingStream(newStream);
+    setIsStreamDialogOpen(true);
+  };
+
+  const handleEditStream = (stream: Stream) => {
+    setEditingStream(stream);
+    setIsStreamDialogOpen(true);
+  };
+
+  const handleSaveStream = async () => {
+    if (!editingStream) return;
+
+    setLoading(true);
+    try {
+      const isNewStream = editingStream.id === 0;
+      const path = isNewStream ? "streams" : `streams/${editingStream.id}`;
+
+      const response = await fetch(`${API_URL}?path=${path}`, {
+        method: isNewStream ? "POST" : "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editingStream)
+      });
+
+      if (response.ok) {
+        await loadData();
+        setIsStreamDialogOpen(false);
+        setEditingStream(null);
+      } else {
+        alert("Ошибка при сохранении трансляции");
+      }
+    } catch (error) {
+      console.error("Failed to save stream:", error);
+      alert("Ошибка при сохранении трансляции");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteStream = async (id: number) => {
+    if (!confirm("Вы уверены, что хотите удалить эту трансляцию?")) return;
+    
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}?path=streams/${id}`, {
+        method: "DELETE"
+      });
+
+      if (response.ok) {
+        await loadData();
+      } else {
+        alert("Ошибка при удалении трансляции");
+      }
+    } catch (error) {
+      console.error("Failed to delete stream:", error);
+      alert("Ошибка при удалении трансляции");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (!isAuthenticated) {
     return (
       <AdminLogin
@@ -356,6 +433,14 @@ const Admin = () => {
           >
             <Icon name="Newspaper" className="mr-2" size={20} />
             НОВОСТИ
+          </Button>
+          <Button
+            onClick={() => setActiveSection("streams")}
+            variant={activeSection === "streams" ? "default" : "outline"}
+            className="font-oswald"
+          >
+            <Icon name="Video" className="mr-2" size={20} />
+            ТРАНСЛЯЦИИ
           </Button>
         </div>
 
@@ -417,6 +502,60 @@ const Admin = () => {
           </div>
         )}
 
+        {!loading && activeSection === "streams" && (
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-oswald font-bold">Управление трансляциями</h2>
+              <Button onClick={handleAddStream}>
+                <Icon name="Plus" className="mr-2" size={20} />
+                Добавить трансляцию
+              </Button>
+            </div>
+            <div className="grid gap-4">
+              {streams.map((stream) => (
+                <Card key={stream.id}>
+                  <CardContent className="p-6">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <h3 className="text-xl font-oswald mb-2">{stream.title}</h3>
+                        <div className="space-y-1 text-sm text-muted-foreground">
+                          <p>Статус: {stream.status === 'live' ? '🔴 В эфире' : stream.status === 'scheduled' ? '📅 Запланирована' : '✅ Завершена'}</p>
+                          <p>Время: {new Date(stream.scheduled_time).toLocaleString('ru-RU')}</p>
+                          <p className="truncate max-w-md">Ссылка: {stream.stream_url}</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEditStream(stream)}
+                        >
+                          <Icon name="Pencil" size={16} />
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDeleteStream(stream.id)}
+                        >
+                          <Icon name="Trash2" size={16} />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+              {streams.length === 0 && (
+                <Card>
+                  <CardContent className="p-12 text-center">
+                    <Icon name="Video" size={48} className="mx-auto mb-4 opacity-30" />
+                    <p className="text-muted-foreground">Трансляций пока нет</p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </div>
+        )}
+
         <PlayerEditDialog
           isOpen={isPlayerDialogOpen}
           onClose={() => setIsPlayerDialogOpen(false)}
@@ -441,6 +580,15 @@ const Admin = () => {
           news={editingNews}
           onNewsChange={setEditingNews}
           onSave={handleSaveNews}
+          loading={loading}
+        />
+
+        <StreamEditDialog
+          isOpen={isStreamDialogOpen}
+          onClose={() => setIsStreamDialogOpen(false)}
+          stream={editingStream}
+          onStreamChange={setEditingStream}
+          onSave={handleSaveStream}
           loading={loading}
         />
       </div>

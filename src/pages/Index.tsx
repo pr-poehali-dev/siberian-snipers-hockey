@@ -80,7 +80,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background relative">
-      <div className="fixed top-4 left-4 z-50 flex gap-2">
+      <div className="fixed top-4 left-4 z-50">
         <Button
           variant="outline"
           size="sm"
@@ -90,6 +90,9 @@ const Index = () => {
           <Icon name="ShoppingBag" className="mr-2" size={16} />
           Магазин
         </Button>
+      </div>
+
+      <div className="fixed top-4 right-4 z-50">
         <Button
           variant="outline"
           size="sm"
