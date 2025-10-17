@@ -10,6 +10,8 @@ import Shop from "./pages/Shop";
 import PlayerStats from "./pages/PlayerStats";
 import News from "./pages/News";
 import Admin from "./pages/Admin";
+import Streams from "./pages/Streams";
+import Budget from "./pages/Budget";
 import NotFound from "./pages/NotFound";
 import Snowfall from "./components/Snowfall";
 
@@ -28,7 +30,9 @@ const App = () => (
           <Route path="/shop" element={<Shop />} />
           <Route path="/player/:id" element={<PlayerStats />} />
           <Route path="/news" element={<News />} />
+          <Route path="/streams" element={<Streams />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/budget" element={<Budget />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

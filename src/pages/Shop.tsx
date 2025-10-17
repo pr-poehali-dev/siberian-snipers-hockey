@@ -12,15 +12,6 @@ import CheckoutDialog from "@/components/shop/CheckoutDialog";
 
 const API_URL = "https://functions.poehali.dev/90140830-0c8d-4493-bfe2-be85f46b2961";
 
-const getUserId = () => {
-  let userId = localStorage.getItem("user_id");
-  if (!userId) {
-    userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    localStorage.setItem("user_id", userId);
-  }
-  return userId;
-};
-
 const Shop = () => {
   const navigate = useNavigate();
   const [cart, setCart] = React.useState<CartItem[]>([]);
@@ -100,27 +91,22 @@ const Shop = () => {
     setIsProcessing(true);
     
     try {
-      const userId = getUserId();
-      const purchaseData = {
-        amount: cartTotal,
-        type: 'product',
-        items: cart.map(item => ({
-          name: item.customName && item.customNumber 
-            ? `${item.name} (${item.customName} #${item.customNumber})`
-            : item.name,
-          price: item.price,
-          quantity: item.quantity
-        }))
-      };
+      for (const item of cart) {
+        const itemName = item.customName && item.customNumber 
+          ? `${item.name} (${item.customName} #${item.customNumber})`
+          : item.name;
+        
+        await fetch(`${API_URL}?path=shop-purchase`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            item_name: itemName,
+            amount: item.price * item.quantity
+          })
+        });
+      }
 
-      const response = await fetch(`${API_URL}?path=purchase`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-User-Id': userId
-        },
-        body: JSON.stringify(purchaseData)
-      });
+      const response = { ok: true };
 
       if (response.ok) {
         setIsProcessing(false);

@@ -317,6 +317,10 @@ const Admin = () => {
             <p className="text-muted-foreground">Управление контентом сайта</p>
           </div>
           <div className="flex gap-3">
+            <Button onClick={() => navigate("/budget")} variant="outline">
+              <Icon name="DollarSign" className="mr-2" size={20} />
+              Бюджет
+            </Button>
             <Button onClick={() => navigate("/")} variant="outline">
               <Icon name="Home" className="mr-2" size={20} />
               На сайт

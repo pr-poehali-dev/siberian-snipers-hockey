@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import Icon from "@/components/ui/icon";
 
-const API_URL = "https://functions.poehali.dev/dcf34c35-43e9-4e43-ad3a-efbf8f2d3ec2";
+const API_URL = "https://functions.poehali.dev/90140830-0c8d-4493-bfe2-be85f46b2961";
 
 interface Player {
   id: number;
@@ -80,7 +80,16 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background relative">
-      <div className="fixed top-4 left-4 z-50">
+      <div className="fixed top-4 left-4 z-50 flex gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => navigate("/shop")}
+          className="bg-white/90 hover:bg-white shadow-lg"
+        >
+          <Icon name="ShoppingBag" className="mr-2" size={16} />
+          Магазин
+        </Button>
         <Button
           variant="outline"
           size="sm"
@@ -125,9 +134,9 @@ const Index = () => {
               size="lg" 
               variant="outline" 
               className="border-white text-white hover:bg-white/10 font-oswald text-lg px-8"
-              onClick={() => setActiveTab("matches")}
+              onClick={() => navigate("/streams")}
             >
-              КАЛЕНДАРЬ МАТЧЕЙ
+              ТРАНСЛЯЦИИ МАТЧЕЙ
             </Button>
           </div>
         </div>
@@ -142,7 +151,7 @@ const Index = () => {
             <TabsTrigger value="matches" className="font-oswald text-sm py-4 px-2">МАТЧИ</TabsTrigger>
             <TabsTrigger value="news" className="font-oswald text-sm py-4 px-2">НОВОСТИ</TabsTrigger>
             <TabsTrigger value="standings" className="font-oswald text-sm py-4 px-2">ТАБЛИЦА</TabsTrigger>
-            <TabsTrigger value="shop" className="font-oswald text-sm py-4 px-2">МАГАЗИН</TabsTrigger>
+            <TabsTrigger value="streams" className="font-oswald text-sm py-4 px-2" onClick={() => navigate("/streams")}>ТРАНСЛЯЦИИ</TabsTrigger>
           </TabsList>
 
           <TabsContent value="players" className="space-y-6 min-h-[400px]">
@@ -384,20 +393,20 @@ const Index = () => {
             )}
           </TabsContent>
 
-          <TabsContent value="shop" className="min-h-[400px]">
+          <TabsContent value="streams" className="min-h-[400px]">
             <div className="text-center py-16">
-              <Icon name="ShoppingBag" size={64} className="mx-auto mb-4 text-primary" />
-              <h3 className="text-3xl font-oswald mb-4">МАГАЗИН АТРИБУТИКИ</h3>
+              <Icon name="Video" size={64} className="mx-auto mb-4 text-primary" />
+              <h3 className="text-3xl font-oswald mb-4">ТРАНСЛЯЦИИ МАТЧЕЙ</h3>
               <p className="text-lg text-muted-foreground mb-6">
-                Джерси, шайбы, аксессуары и другая официальная продукция команды
+                Смотрите прямые эфиры и повторы всех игр команды
               </p>
               <Button 
                 size="lg" 
                 className="font-oswald text-lg px-8"
-                onClick={() => navigate("/shop")}
+                onClick={() => navigate("/streams")}
               >
-                <Icon name="ShoppingCart" className="mr-2" size={20} />
-                ПЕРЕЙТИ В МАГАЗИН
+                <Icon name="Play" className="mr-2" size={20} />
+                СМОТРЕТЬ ТРАНСЛЯЦИИ
               </Button>
             </div>
           </TabsContent>

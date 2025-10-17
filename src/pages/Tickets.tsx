@@ -9,85 +9,106 @@ import Icon from "@/components/ui/icon";
 
 const API_URL = "https://functions.poehali.dev/90140830-0c8d-4493-bfe2-be85f46b2961";
 
-const getUserId = () => {
-  let userId = localStorage.getItem("user_id");
-  if (!userId) {
-    userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    localStorage.setItem("user_id", userId);
-  }
-  return userId;
-};
+interface Match {
+  id: number;
+  opponent: string;
+  date: string;
+  time: string;
+  location: string;
+}
 
 interface Seat {
   row: number;
   seat: number;
   status: "available" | "occupied" | "selected";
-  sector: string;
   price: number;
 }
 
 const Tickets = () => {
   const navigate = useNavigate();
+  const [matches, setMatches] = React.useState<Match[]>([]);
+  const [selectedMatch, setSelectedMatch] = React.useState<Match | null>(null);
   const [selectedSeats, setSelectedSeats] = React.useState<Seat[]>([]);
-  const [viewMode, setViewMode] = React.useState<"list" | "map">("map");
+  const [bookedSeats, setBookedSeats] = React.useState<string[]>([]);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [isProcessing, setIsProcessing] = React.useState(false);
   const [isPurchased, setIsPurchased] = React.useState(false);
   const [formData, setFormData] = React.useState({
-    firstName: "",
-    lastName: "",
-    cardNumber: ""
+    name: "",
+    phone: ""
   });
+
+  React.useEffect(() => {
+    loadMatches();
+  }, []);
+
+  React.useEffect(() => {
+    if (selectedMatch) {
+      loadBookedSeats(selectedMatch.id);
+    }
+  }, [selectedMatch]);
+
+  const loadMatches = async () => {
+    try {
+      const response = await fetch(`${API_URL}?path=matches`);
+      const data = await response.json();
+      const upcomingMatches = data.matches.filter((m: any) => m.status === 'upcoming');
+      setMatches(upcomingMatches || []);
+      if (upcomingMatches.length > 0) {
+        setSelectedMatch(upcomingMatches[0]);
+      }
+    } catch (error) {
+      console.error("Failed to load matches:", error);
+    }
+  };
+
+  const loadBookedSeats = async (matchId: number) => {
+    try {
+      const response = await fetch(`${API_URL}?path=tickets&match_id=${matchId}`);
+      const data = await response.json();
+      setBookedSeats(data.booked_seats || []);
+      setSelectedSeats([]);
+    } catch (error) {
+      console.error("Failed to load booked seats:", error);
+    }
+  };
 
   const generateSeats = (): Seat[] => {
     const seats: Seat[] = [];
-    const occupiedSeats = [
-      { row: 11, seats: [9, 10, 11, 12, 13, 14, 15, 16] },
-      { row: 12, seats: [3] },
-      { row: 13, seats: [1, 2, 8, 9, 10, 11] },
-      { row: 14, seats: [2, 3, 4, 5, 9, 10, 11, 12] },
-      { row: 15, seats: [8, 9] }
-    ];
-
-    for (let row = 11; row <= 20; row++) {
-      for (let seat = 1; seat <= 16; seat++) {
-        const isOccupied = occupiedSeats.some(
-          r => r.row === row && r.seats.includes(seat)
-        );
+    for (let row = 1; row <= 10; row++) {
+      for (let seat = 1; seat <= 20; seat++) {
+        const seatNumber = `${row}-${seat}`;
+        const isBooked = bookedSeats.includes(seatNumber);
         
         seats.push({
           row,
           seat,
-          status: isOccupied ? "occupied" : "available",
-          sector: "Д3",
-          price: row <= 14 ? 500 : 400
+          status: isBooked ? "occupied" : "available",
+          price: row <= 3 ? 1000 : row <= 6 ? 750 : 500
         });
       }
     }
-
     return seats;
   };
 
-  const [seats] = React.useState<Seat[]>(generateSeats());
+  const seats = generateSeats();
 
   const handleSeatClick = (seat: Seat) => {
     if (seat.status === "occupied") return;
 
-    const isSelected = selectedSeats.some(
-      s => s.row === seat.row && s.seat === seat.seat
-    );
+    const seatNumber = `${seat.row}-${seat.seat}`;
+    const isSelected = selectedSeats.some(s => `${s.row}-${s.seat}` === seatNumber);
 
     if (isSelected) {
-      setSelectedSeats(selectedSeats.filter(
-        s => !(s.row === seat.row && s.seat === seat.seat)
-      ));
+      setSelectedSeats(selectedSeats.filter(s => `${s.row}-${s.seat}` !== seatNumber));
     } else {
       setSelectedSeats([...selectedSeats, seat]);
     }
   };
 
   const getSeatStatus = (row: number, seat: number): "available" | "occupied" | "selected" => {
-    const isSelected = selectedSeats.some(s => s.row === row && s.seat === seat);
+    const seatNumber = `${row}-${seat}`;
+    const isSelected = selectedSeats.some(s => `${s.row}-${s.seat}` === seatNumber);
     if (isSelected) return "selected";
     
     const seatData = seats.find(s => s.row === row && s.seat === seat);
@@ -96,74 +117,44 @@ const Tickets = () => {
 
   const totalPrice = selectedSeats.reduce((sum, seat) => sum + seat.price, 0);
 
-  const handleFormChange = (field: string, value: string) => {
-    if (field === "cardNumber") {
-      const numbers = value.replace(/\D/g, "").slice(0, 16);
-      setFormData({ ...formData, [field]: numbers });
-    } else {
-      setFormData({ ...formData, [field]: value });
-    }
-  };
-
   const handlePurchase = async () => {
+    if (!formData.name || !formData.phone || selectedSeats.length === 0 || !selectedMatch) return;
+
     setIsProcessing(true);
-    
     try {
-      const userId = getUserId();
-      const purchaseData = {
-        amount: totalPrice,
-        type: 'ticket',
-        items: selectedSeats.map(seat => ({
-          row: seat.row,
-          seat: seat.seat,
-          sector: seat.sector,
-          price: seat.price
-        }))
-      };
-
-      const response = await fetch(`${API_URL}?path=purchase`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-User-Id': userId
-        },
-        body: JSON.stringify(purchaseData)
-      });
-
-      if (response.ok) {
-        setIsProcessing(false);
-        setIsPurchased(true);
-        
-        setTimeout(() => {
-          setIsDialogOpen(false);
-          setIsPurchased(false);
-          setSelectedSeats([]);
-          setFormData({ firstName: "", lastName: "", cardNumber: "" });
-        }, 2500);
+      for (const seat of selectedSeats) {
+        const seatNumber = `${seat.row}-${seat.seat}`;
+        await fetch(`${API_URL}?path=tickets`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            match_id: selectedMatch.id,
+            seat_number: seatNumber,
+            buyer_name: formData.name,
+            buyer_phone: formData.phone,
+            price: seat.price
+          })
+        });
       }
+
+      setIsPurchased(true);
+      setTimeout(() => {
+        setIsDialogOpen(false);
+        setIsPurchased(false);
+        setSelectedSeats([]);
+        setFormData({ name: "", phone: "" });
+        loadBookedSeats(selectedMatch.id);
+      }, 2000);
     } catch (error) {
+      alert('Ошибка при покупке билета. Возможно место уже занято.');
       console.error("Purchase failed:", error);
+    } finally {
       setIsProcessing(false);
-      alert("Ошибка при покупке билетов");
     }
   };
-
-  const isFormValid = formData.firstName && formData.lastName && formData.cardNumber.length >= 13;
 
   return (
     <div className="min-h-screen bg-background relative">
-      <div className="fixed top-4 left-4 z-50">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => navigate("/admin")}
-          className="bg-white/90 hover:bg-white shadow-lg"
-        >
-          <Icon name="Settings" className="mr-2" size={16} />
-          Админ
-        </Button>
-      </div>
-
       <div className="fixed inset-0 pointer-events-none opacity-5 z-0">
         <img 
           src="https://cdn.poehali.dev/files/5eafa8e1-7cd4-4959-927d-702849e9a9e9.jpg" 
@@ -171,101 +162,102 @@ const Tickets = () => {
           className="w-full h-full object-contain"
         />
       </div>
+
       <div className="bg-primary text-white py-8 relative z-10">
         <div className="container mx-auto px-4">
           <Button
             variant="ghost"
-            className="text-white hover:bg-white/10 mb-4"
             onClick={() => navigate("/")}
+            className="text-white hover:bg-white/10 mb-4"
           >
-            <Icon name="ArrowLeft" size={20} className="mr-2" />
-            Назад
+            <Icon name="ArrowLeft" className="mr-2" size={20} />
+            Назад на главную
           </Button>
-          <h1 className="text-5xl font-oswald font-bold">КУПИТЬ БИЛЕТЫ</h1>
-          <p className="text-xl font-roboto mt-2">Матч: Сибирские Снайперы - Академия Михайлова</p>
-          <p className="text-lg font-roboto mt-1">Дата: 16 октября 2025, 19:00</p>
+          <div className="flex items-center gap-4">
+            <Icon name="Ticket" size={48} />
+            <div>
+              <h1 className="text-5xl font-oswald font-bold">КУПИТЬ БИЛЕТЫ</h1>
+              <p className="text-xl font-roboto mt-2">Выберите матч и места</p>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8 relative z-10">
-        <div className="flex gap-4 mb-6">
-          <Button
-            variant={viewMode === "map" ? "default" : "outline"}
-            onClick={() => setViewMode("map")}
-            className="font-oswald"
-          >
-            <Icon name="Map" size={18} className="mr-2" />
-            СХЕМА АРЕНЫ
-          </Button>
-          <Button
-            variant={viewMode === "list" ? "default" : "outline"}
-            onClick={() => setViewMode("list")}
-            className="font-oswald"
-          >
-            <Icon name="List" size={18} className="mr-2" />
-            СПИСОК МЕСТ
-          </Button>
-        </div>
+      <div className="container mx-auto px-4 py-12 relative z-10">
+        {matches.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-xl text-muted-foreground">Матчей пока нет</p>
+          </div>
+        ) : (
+          <>
+            <div className="mb-8">
+              <h2 className="text-2xl font-oswald mb-4">Выберите матч:</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {matches.map(match => (
+                  <Card 
+                    key={match.id}
+                    className={`cursor-pointer transition-all ${selectedMatch?.id === match.id ? 'ring-2 ring-primary' : ''}`}
+                    onClick={() => setSelectedMatch(match)}
+                  >
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Icon name="Calendar" size={16} />
+                        <span className="font-roboto">{match.date} в {match.time}</span>
+                      </div>
+                      <h3 className="text-xl font-oswald mb-2">{match.opponent}</h3>
+                      <p className="text-sm text-muted-foreground">{match.location}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            {viewMode === "map" ? (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="font-oswald flex items-center justify-between flex-wrap gap-4">
-                    <span>СЕКТОР Д3</span>
-                    <div className="flex gap-4 text-sm font-roboto font-normal">
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 bg-muted rounded"></div>
-                        <span>Свободно</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 bg-destructive rounded"></div>
-                        <span>Занято</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 bg-accent rounded"></div>
-                        <span>Выбрано</span>
-                      </div>
-                    </div>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="bg-muted/30 p-8 rounded-lg">
+            {selectedMatch && (
+              <>
+                <Card className="mb-8">
+                  <CardHeader>
+                    <CardTitle className="font-oswald flex items-center gap-2">
+                      <Icon name="Armchair" size={24} />
+                      СХЕМА ЗАЛА
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
                     <div className="mb-6">
-                      <img 
-                        src="https://cdn.poehali.dev/files/f911c5ea-6da9-4a51-9628-84aaccad338c.jpg" 
-                        alt="Схема арены"
-                        className="w-full rounded-lg mb-4 opacity-40"
-                      />
+                      <div className="bg-primary/10 p-4 rounded-lg mb-4">
+                        <div className="flex items-center justify-center gap-2 text-primary font-oswald text-xl">
+                          <Icon name="Minus" size={32} />
+                          ЛЕД
+                          <Icon name="Minus" size={32} />
+                        </div>
+                      </div>
                     </div>
-                    
-                    <div className="space-y-2">
-                      {[...Array(10)].map((_, rowIndex) => {
-                        const row = 11 + rowIndex;
+
+                    <div className="space-y-2 max-w-4xl mx-auto">
+                      {Array.from({ length: 10 }, (_, rowIndex) => {
+                        const row = rowIndex + 1;
                         return (
                           <div key={row} className="flex items-center gap-2">
-                            <span className="text-sm font-roboto w-8 text-muted-foreground">{row}</span>
-                            <div className="flex gap-1 flex-1">
-                              {[...Array(16)].map((_, seatIndex) => {
+                            <Badge variant="outline" className="w-12 justify-center font-oswald">
+                              {row}
+                            </Badge>
+                            <div className="flex gap-1 flex-1 justify-center">
+                              {Array.from({ length: 20 }, (_, seatIndex) => {
                                 const seat = seatIndex + 1;
                                 const status = getSeatStatus(row, seat);
-                                const seatData = seats.find(s => s.row === row && s.seat === seat);
-                                
                                 return (
                                   <button
                                     key={seat}
-                                    onClick={() => seatData && handleSeatClick(seatData)}
+                                    onClick={() => handleSeatClick(seats.find(s => s.row === row && s.seat === seat)!)}
                                     disabled={status === "occupied"}
-                                    className={`
-                                      w-7 h-7 rounded text-xs font-roboto transition-all
-                                      ${status === "available" ? "bg-muted hover:bg-muted/70" : ""}
-                                      ${status === "occupied" ? "bg-destructive cursor-not-allowed opacity-50" : ""}
-                                      ${status === "selected" ? "bg-accent text-white" : ""}
-                                    `}
-                                  >
-                                    {seat}
-                                  </button>
+                                    className={`w-8 h-8 rounded transition-all ${
+                                      status === "available"
+                                        ? "bg-green-500 hover:bg-green-600"
+                                        : status === "selected"
+                                        ? "bg-blue-600 ring-2 ring-blue-400"
+                                        : "bg-gray-400 cursor-not-allowed"
+                                    }`}
+                                    title={`Ряд ${row}, Место ${seat}`}
+                                  />
                                 );
                               })}
                             </div>
@@ -273,176 +265,100 @@ const Tickets = () => {
                         );
                       })}
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ) : (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="font-oswald">ДОСТУПНЫЕ МЕСТА</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2 max-h-[600px] overflow-y-auto">
-                    {seats.filter(s => s.status === "available").map((seat) => (
-                      <div
-                        key={`${seat.row}-${seat.seat}`}
-                        className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 cursor-pointer"
-                        onClick={() => handleSeatClick(seat)}
-                      >
-                        <div className="flex items-center gap-4">
-                          <Icon name="Armchair" size={20} className="text-muted-foreground" />
-                          <div>
-                            <p className="font-oswald">Ряд {seat.row}, Место {seat.seat}</p>
-                            <p className="text-sm text-muted-foreground">Сектор {seat.sector}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <Badge className="font-roboto">{seat.price} ₽</Badge>
-                          {selectedSeats.some(s => s.row === seat.row && s.seat === seat.seat) && (
-                            <Icon name="Check" size={20} className="text-accent" />
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </div>
 
-          <div>
-            <Card className="sticky top-4">
-              <CardHeader>
-                <CardTitle className="font-oswald">ВАШИ БИЛЕТЫ</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {selectedSeats.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Icon name="Ticket" size={48} className="mx-auto mb-2 opacity-30" />
-                    <p>Выберите места</p>
-                  </div>
-                ) : (
-                  <>
-                    <div className="space-y-2 max-h-40 overflow-y-auto">
-                      {selectedSeats.map((seat) => (
-                        <div key={`${seat.row}-${seat.seat}`} className="flex items-center justify-between text-sm">
-                          <span>Ряд {seat.row}, Место {seat.seat}</span>
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold">{seat.price} ₽</span>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleSeatClick(seat)}
-                              className="h-6 w-6 p-0"
-                            >
-                              <Icon name="X" size={14} />
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="border-t pt-4">
-                      <div className="flex justify-between items-center mb-4">
-                        <span className="font-oswald text-lg">ИТОГО:</span>
-                        <span className="font-bold text-2xl text-accent">{totalPrice} ₽</span>
+                    <div className="flex justify-center gap-6 mt-8">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 bg-green-500 rounded" />
+                        <span className="font-roboto text-sm">Свободно</span>
                       </div>
-                      <Button
-                        className="w-full font-oswald"
-                        onClick={() => setIsDialogOpen(true)}
-                      >
-                        <Icon name="CreditCard" className="mr-2" size={18} />
-                        ОФОРМИТЬ
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 bg-blue-600 rounded" />
+                        <span className="font-roboto text-sm">Выбрано</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 bg-gray-400 rounded" />
+                        <span className="font-roboto text-sm">Занято</span>
+                      </div>
                     </div>
-                  </>
+                  </CardContent>
+                </Card>
+
+                {selectedSeats.length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="font-oswald">ВАШИ МЕСТА</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        {selectedSeats.map((seat, index) => (
+                          <div key={index} className="flex justify-between items-center border-b pb-2">
+                            <span className="font-roboto">Ряд {seat.row}, Место {seat.seat}</span>
+                            <span className="font-bold">{seat.price} ₽</span>
+                          </div>
+                        ))}
+                        <div className="flex justify-between items-center pt-4 border-t-2">
+                          <span className="font-oswald text-xl">ИТОГО:</span>
+                          <span className="font-oswald text-2xl text-primary">{totalPrice} ₽</span>
+                        </div>
+                        <Button 
+                          className="w-full font-oswald text-lg" 
+                          size="lg"
+                          onClick={() => setIsDialogOpen(true)}
+                        >
+                          КУПИТЬ БИЛЕТЫ
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
                 )}
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+              </>
+            )}
+          </>
+        )}
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle className="font-oswald text-2xl">
-              {isPurchased ? "ГОТОВО!" : "ОФОРМЛЕНИЕ БИЛЕТОВ"}
-            </DialogTitle>
-            {!isPurchased && (
-              <DialogDescription>
-                Заполните данные для покупки билетов
-              </DialogDescription>
-            )}
+            <DialogTitle className="font-oswald text-2xl">Оформление билетов</DialogTitle>
+            <DialogDescription>
+              Введите ваши контактные данные
+            </DialogDescription>
           </DialogHeader>
-
+          
           {isPurchased ? (
-            <div className="text-center py-8 space-y-4">
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-                <Icon name="Check" size={48} className="text-green-600" />
+            <div className="text-center py-8">
+              <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Icon name="Check" size={32} className="text-white" />
               </div>
-              <h3 className="text-2xl font-oswald text-green-600">БИЛЕТЫ КУПЛЕНЫ!</h3>
-              <p className="text-muted-foreground">Билеты отправлены на вашу электронную почту</p>
+              <h3 className="text-2xl font-oswald mb-2">Билеты куплены!</h3>
+              <p className="text-muted-foreground">Спасибо за покупку</p>
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="bg-muted/30 p-4 rounded-lg space-y-2">
-                <h4 className="font-oswald mb-2">ВАШИ МЕСТА:</h4>
-                {selectedSeats.map((seat) => (
-                  <div key={`${seat.row}-${seat.seat}`} className="flex justify-between text-sm">
-                    <span>Ряд {seat.row}, Место {seat.seat}</span>
-                    <span>{seat.price} ₽</span>
-                  </div>
-                ))}
-                <div className="border-t pt-2 flex justify-between font-bold">
-                  <span>ИТОГО:</span>
-                  <span>{totalPrice} ₽</span>
-                </div>
+              <div>
+                <label className="text-sm font-roboto mb-2 block">Имя и Фамилия</label>
+                <Input
+                  value={formData.name}
+                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  placeholder="Иван Иванов"
+                />
               </div>
-
-              <div className="space-y-3">
-                <div>
-                  <label className="text-sm font-medium">Имя</label>
-                  <Input
-                    value={formData.firstName}
-                    onChange={(e) => handleFormChange("firstName", e.target.value)}
-                    placeholder="Иван"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Фамилия</label>
-                  <Input
-                    value={formData.lastName}
-                    onChange={(e) => handleFormChange("lastName", e.target.value)}
-                    placeholder="Иванов"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Номер карты</label>
-                  <Input
-                    value={formData.cardNumber}
-                    onChange={(e) => handleFormChange("cardNumber", e.target.value)}
-                    placeholder="1234 5678 9012 3456"
-                    maxLength={16}
-                  />
-                </div>
+              <div>
+                <label className="text-sm font-roboto mb-2 block">Телефон</label>
+                <Input
+                  value={formData.phone}
+                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                  placeholder="+7 (999) 123-45-67"
+                />
               </div>
-
-              <Button
-                className="w-full font-oswald text-lg py-6"
+              <Button 
+                className="w-full font-oswald text-lg" 
+                size="lg"
                 onClick={handlePurchase}
-                disabled={!isFormValid || isProcessing}
+                disabled={isProcessing || !formData.name || !formData.phone}
               >
-                {isProcessing ? (
-                  <>
-                    <Icon name="Loader2" className="mr-2 animate-spin" size={20} />
-                    ОБРАБОТКА...
-                  </>
-                ) : (
-                  <>
-                    <Icon name="ShoppingCart" className="mr-2" size={20} />
-                    ОПЛАТИТЬ {totalPrice} ₽
-                  </>
-                )}
+                {isProcessing ? "Обработка..." : `Оплатить ${totalPrice} ₽`}
               </Button>
             </div>
           )}

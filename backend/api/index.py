@@ -1,5 +1,5 @@
 '''
-Business: API для управления данными сайта хоккейного клуба и бюджетом пользователей
+Business: API для управления хоккейным клубом с билетами, бюджетом, трансляциями
 Args: event - dict with httpMethod, body, queryStringParameters
       context - object with attributes: request_id, function_name
 Returns: HTTP response dict with CORS headers
@@ -8,7 +8,7 @@ import json
 import os
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 
 def get_db_connection():
     '''Создает подключение к базе данных'''
@@ -19,7 +19,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     method: str = event.get('httpMethod', 'GET')
     path: str = event.get('queryStringParameters', {}).get('path', '')
     
-    # CORS headers
     cors_headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
@@ -28,262 +27,195 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         'Content-Type': 'application/json'
     }
     
-    # Handle OPTIONS for CORS
     if method == 'OPTIONS':
-        return {
-            'statusCode': 200,
-            'headers': cors_headers,
-            'body': ''
-        }
+        return {'statusCode': 200, 'headers': cors_headers, 'body': ''}
     
     conn = None
     try:
         conn = get_db_connection()
         cur = conn.cursor()
         
-        # GET запросы
         if method == 'GET':
-            # Получить всех игроков
             if path == 'players':
                 cur.execute('SELECT * FROM players ORDER BY number')
-                players = cur.fetchall()
-                return {
-                    'statusCode': 200,
-                    'headers': cors_headers,
-                    'body': json.dumps({'players': players}, default=str)
-                }
+                return {'statusCode': 200, 'headers': cors_headers, 'body': json.dumps({'players': cur.fetchall()}, default=str)}
             
-            # Получить конкретного игрока
-            elif path.startswith('players/'):
-                player_id = path.split('/')[-1]
-                cur.execute('SELECT * FROM players WHERE id = %s', (player_id,))
-                player = cur.fetchone()
-                if player:
-                    return {
-                        'statusCode': 200,
-                        'headers': cors_headers,
-                        'body': json.dumps({'player': player}, default=str)
-                    }
-                return {
-                    'statusCode': 404,
-                    'headers': cors_headers,
-                    'body': json.dumps({'error': 'Player not found'})
-                }
-            
-            # Получить все матчи
             elif path == 'matches':
                 cur.execute('SELECT * FROM matches ORDER BY date')
-                matches = cur.fetchall()
-                return {
-                    'statusCode': 200,
-                    'headers': cors_headers,
-                    'body': json.dumps({'matches': matches}, default=str)
-                }
+                return {'statusCode': 200, 'headers': cors_headers, 'body': json.dumps({'matches': cur.fetchall()}, default=str)}
             
-            # Получить все новости
             elif path == 'news':
                 cur.execute('SELECT * FROM news ORDER BY date DESC')
-                news = cur.fetchall()
-                return {
-                    'statusCode': 200,
-                    'headers': cors_headers,
-                    'body': json.dumps({'news': news}, default=str)
-                }
+                return {'statusCode': 200, 'headers': cors_headers, 'body': json.dumps({'news': cur.fetchall()}, default=str)}
             
-            # Получить турнирную таблицу
-            elif path == 'standings':
-                cur.execute('SELECT * FROM standings ORDER BY place')
-                standings = cur.fetchall()
-                return {
-                    'statusCode': 200,
-                    'headers': cors_headers,
-                    'body': json.dumps({'standings': standings}, default=str)
-                }
+            elif path == 'tickets':
+                match_id = event.get('queryStringParameters', {}).get('match_id')
+                if match_id:
+                    cur.execute('SELECT seat_number FROM tickets WHERE match_id = %s', (match_id,))
+                    booked = [row['seat_number'] for row in cur.fetchall()]
+                    return {'statusCode': 200, 'headers': cors_headers, 'body': json.dumps({'booked_seats': booked})}
+                return {'statusCode': 400, 'headers': cors_headers, 'body': json.dumps({'error': 'match_id required'})}
             
-            # Получить бюджет пользователя
             elif path == 'budget':
-                user_id = event.get('headers', {}).get('X-User-Id', 'anonymous')
-                cur.execute('SELECT * FROM user_budgets WHERE user_identifier = %s', (user_id,))
-                budget = cur.fetchone()
-                if budget:
-                    return {
-                        'statusCode': 200,
-                        'headers': cors_headers,
-                        'body': json.dumps({'budget': budget}, default=str)
-                    }
-                return {
-                    'statusCode': 200,
-                    'headers': cors_headers,
-                    'body': json.dumps({'budget': {'total_spent': 0}})
-                }
+                cur.execute('SELECT * FROM budget_transactions ORDER BY transaction_date DESC')
+                transactions = cur.fetchall()
+                cur.execute('SELECT SUM(amount) as total FROM budget_transactions WHERE type = %s', ('income',))
+                income = cur.fetchone()['total'] or 0
+                cur.execute('SELECT SUM(amount) as total FROM budget_transactions WHERE type = %s', ('expense',))
+                expense = cur.fetchone()['total'] or 0
+                return {'statusCode': 200, 'headers': cors_headers, 'body': json.dumps({
+                    'transactions': transactions,
+                    'total_income': float(income),
+                    'total_expense': float(expense),
+                    'balance': float(income - expense)
+                }, default=str)}
+            
+            elif path == 'shop':
+                cur.execute('SELECT * FROM shop_items WHERE available = true')
+                return {'statusCode': 200, 'headers': cors_headers, 'body': json.dumps({'items': cur.fetchall()}, default=str)}
+            
+            elif path == 'streams':
+                cur.execute('SELECT * FROM streams ORDER BY scheduled_time DESC')
+                return {'statusCode': 200, 'headers': cors_headers, 'body': json.dumps({'streams': cur.fetchall()}, default=str)}
         
-        # POST запросы (создание и покупки)
         elif method == 'POST':
             body_data = json.loads(event.get('body', '{}'))
             
-            # Покупка (обновление бюджета)
-            if path == 'purchase':
-                user_id = event.get('headers', {}).get('X-User-Id', 'anonymous')
-                amount = body_data.get('amount', 0)
-                purchase_type = body_data.get('type', 'ticket')
-                items = json.dumps(body_data.get('items', []))
-                
-                # Проверяем существует ли бюджет
-                cur.execute('SELECT * FROM user_budgets WHERE user_identifier = %s', (user_id,))
-                existing = cur.fetchone()
-                
-                if existing:
-                    # Обновляем существующий
-                    new_total = existing['total_spent'] + amount
-                    cur.execute(
-                        'UPDATE user_budgets SET total_spent = %s, last_purchase = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE user_identifier = %s',
-                        (new_total, user_id)
-                    )
-                else:
-                    # Создаем новый
-                    cur.execute(
-                        'INSERT INTO user_budgets (user_identifier, total_spent, last_purchase) VALUES (%s, %s, CURRENT_TIMESTAMP)',
-                        (user_id, amount)
-                    )
-                
-                # Добавляем в историю покупок
+            if path == 'players':
                 cur.execute(
-                    'INSERT INTO purchase_history (user_identifier, purchase_type, items, total_amount) VALUES (%s, %s, %s, %s)',
-                    (user_id, purchase_type, items, amount)
+                    'INSERT INTO players (name, number, position, photo, bio) VALUES (%s, %s, %s, %s, %s) RETURNING *',
+                    (body_data['name'], body_data['number'], body_data['position'], body_data.get('photo'), body_data.get('bio', ''))
                 )
-                
                 conn.commit()
-                
-                # Получаем обновленный бюджет
-                cur.execute('SELECT * FROM user_budgets WHERE user_identifier = %s', (user_id,))
-                budget = cur.fetchone()
-                
-                return {
-                    'statusCode': 200,
-                    'headers': cors_headers,
-                    'body': json.dumps({'success': True, 'budget': budget}, default=str)
-                }
+                return {'statusCode': 201, 'headers': cors_headers, 'body': json.dumps({'player': cur.fetchone()}, default=str)}
+            
+            elif path == 'matches':
+                cur.execute(
+                    'INSERT INTO matches (opponent, date, time, location, status, score) VALUES (%s, %s, %s, %s, %s, %s) RETURNING *',
+                    (body_data['opponent'], body_data['date'], body_data['time'], body_data['location'], body_data.get('status', 'upcoming'), body_data.get('score'))
+                )
+                conn.commit()
+                return {'statusCode': 201, 'headers': cors_headers, 'body': json.dumps({'match': cur.fetchone()}, default=str)}
+            
+            elif path == 'news':
+                cur.execute(
+                    'INSERT INTO news (title, date, image, excerpt, content) VALUES (%s, %s, %s, %s, %s) RETURNING *',
+                    (body_data['title'], body_data['date'], body_data['image'], body_data['excerpt'], body_data.get('content', ''))
+                )
+                conn.commit()
+                return {'statusCode': 201, 'headers': cors_headers, 'body': json.dumps({'news': cur.fetchone()}, default=str)}
+            
+            elif path == 'tickets':
+                try:
+                    cur.execute(
+                        'INSERT INTO tickets (match_id, seat_number, buyer_name, buyer_phone, price) VALUES (%s, %s, %s, %s, %s) RETURNING *',
+                        (body_data['match_id'], body_data['seat_number'], body_data['buyer_name'], body_data['buyer_phone'], body_data['price'])
+                    )
+                    ticket = cur.fetchone()
+                    
+                    cur.execute(
+                        'INSERT INTO budget_transactions (type, description, amount, category) VALUES (%s, %s, %s, %s)',
+                        ('income', f'Продажа билета на место {body_data["seat_number"]}', body_data['price'], 'tickets')
+                    )
+                    
+                    conn.commit()
+                    return {'statusCode': 201, 'headers': cors_headers, 'body': json.dumps({'ticket': ticket}, default=str)}
+                except psycopg2.IntegrityError:
+                    conn.rollback()
+                    return {'statusCode': 409, 'headers': cors_headers, 'body': json.dumps({'error': 'Seat already booked'})}
+            
+            elif path == 'budget':
+                cur.execute(
+                    'INSERT INTO budget_transactions (type, description, amount, category) VALUES (%s, %s, %s, %s) RETURNING *',
+                    (body_data['type'], body_data['description'], body_data['amount'], body_data['category'])
+                )
+                conn.commit()
+                return {'statusCode': 201, 'headers': cors_headers, 'body': json.dumps({'transaction': cur.fetchone()}, default=str)}
+            
+            elif path == 'shop-purchase':
+                cur.execute(
+                    'INSERT INTO budget_transactions (type, description, amount, category) VALUES (%s, %s, %s, %s)',
+                    ('income', f'Покупка в магазине: {body_data["item_name"]}', body_data['amount'], 'merchandise')
+                )
+                conn.commit()
+                return {'statusCode': 200, 'headers': cors_headers, 'body': json.dumps({'success': True})}
+            
+            elif path == 'streams':
+                cur.execute(
+                    'INSERT INTO streams (match_id, title, stream_url, status, scheduled_time, thumbnail) VALUES (%s, %s, %s, %s, %s, %s) RETURNING *',
+                    (body_data.get('match_id'), body_data['title'], body_data['stream_url'], body_data.get('status', 'scheduled'), body_data['scheduled_time'], body_data.get('thumbnail'))
+                )
+                conn.commit()
+                return {'statusCode': 201, 'headers': cors_headers, 'body': json.dumps({'stream': cur.fetchone()}, default=str)}
         
-        # PUT запросы (обновление через админку)
         elif method == 'PUT':
             body_data = json.loads(event.get('body', '{}'))
             
-            # Обновить игрока
             if path.startswith('players/'):
                 player_id = path.split('/')[-1]
-                fields = []
-                values = []
-                
-                for key, value in body_data.items():
-                    if key != 'id':
-                        fields.append(f'{key} = %s')
-                        values.append(value)
-                
-                if fields:
-                    values.append(player_id)
-                    query = f'UPDATE players SET {", ".join(fields)}, updated_at = CURRENT_TIMESTAMP WHERE id = %s'
-                    cur.execute(query, tuple(values))
-                    conn.commit()
-                
-                return {
-                    'statusCode': 200,
-                    'headers': cors_headers,
-                    'body': json.dumps({'success': True})
-                }
+                fields = [f'{k} = %s' for k in body_data if k != 'id']
+                values = [v for k, v in body_data.items() if k != 'id'] + [player_id]
+                cur.execute(f'UPDATE players SET {", ".join(fields)} WHERE id = %s', tuple(values))
+                conn.commit()
+                return {'statusCode': 200, 'headers': cors_headers, 'body': json.dumps({'success': True})}
             
-            # Обновить матч
             elif path.startswith('matches/'):
                 match_id = path.split('/')[-1]
-                fields = []
-                values = []
-                
-                for key, value in body_data.items():
-                    if key != 'id':
-                        fields.append(f'{key} = %s')
-                        values.append(value)
-                
-                if fields:
-                    values.append(match_id)
-                    query = f'UPDATE matches SET {", ".join(fields)}, updated_at = CURRENT_TIMESTAMP WHERE id = %s'
-                    cur.execute(query, tuple(values))
-                    conn.commit()
-                
-                return {
-                    'statusCode': 200,
-                    'headers': cors_headers,
-                    'body': json.dumps({'success': True})
-                }
+                fields = [f'{k} = %s' for k in body_data if k != 'id']
+                values = [v for k, v in body_data.items() if k != 'id'] + [match_id]
+                cur.execute(f'UPDATE matches SET {", ".join(fields)} WHERE id = %s', tuple(values))
+                conn.commit()
+                return {'statusCode': 200, 'headers': cors_headers, 'body': json.dumps({'success': True})}
             
-            # Обновить новость
             elif path.startswith('news/'):
                 news_id = path.split('/')[-1]
-                fields = []
-                values = []
-                
-                for key, value in body_data.items():
-                    if key != 'id':
-                        fields.append(f'{key} = %s')
-                        values.append(value)
-                
-                if fields:
-                    values.append(news_id)
-                    query = f'UPDATE news SET {", ".join(fields)}, updated_at = CURRENT_TIMESTAMP WHERE id = %s'
-                    cur.execute(query, tuple(values))
-                    conn.commit()
-                
-                return {
-                    'statusCode': 200,
-                    'headers': cors_headers,
-                    'body': json.dumps({'success': True})
-                }
+                fields = [f'{k} = %s' for k in body_data if k != 'id']
+                values = [v for k, v in body_data.items() if k != 'id'] + [news_id]
+                cur.execute(f'UPDATE news SET {", ".join(fields)} WHERE id = %s', tuple(values))
+                conn.commit()
+                return {'statusCode': 200, 'headers': cors_headers, 'body': json.dumps({'success': True})}
+            
+            elif path.startswith('streams/'):
+                stream_id = path.split('/')[-1]
+                fields = [f'{k} = %s' for k in body_data if k != 'id']
+                values = [v for k, v in body_data.items() if k != 'id'] + [stream_id]
+                cur.execute(f'UPDATE streams SET {", ".join(fields)} WHERE id = %s', tuple(values))
+                conn.commit()
+                return {'statusCode': 200, 'headers': cors_headers, 'body': json.dumps({'success': True})}
         
-        # DELETE запросы
         elif method == 'DELETE':
-            # Удалить игрока
             if path.startswith('players/'):
-                player_id = path.split('/')[-1]
-                cur.execute('DELETE FROM players WHERE id = %s', (player_id,))
+                cur.execute('DELETE FROM players WHERE id = %s', (path.split('/')[-1],))
                 conn.commit()
-                return {
-                    'statusCode': 200,
-                    'headers': cors_headers,
-                    'body': json.dumps({'success': True})
-                }
+                return {'statusCode': 200, 'headers': cors_headers, 'body': json.dumps({'success': True})}
             
-            # Удалить матч
             elif path.startswith('matches/'):
-                match_id = path.split('/')[-1]
-                cur.execute('DELETE FROM matches WHERE id = %s', (match_id,))
+                cur.execute('DELETE FROM matches WHERE id = %s', (path.split('/')[-1],))
                 conn.commit()
-                return {
-                    'statusCode': 200,
-                    'headers': cors_headers,
-                    'body': json.dumps({'success': True})
-                }
+                return {'statusCode': 200, 'headers': cors_headers, 'body': json.dumps({'success': True})}
             
-            # Удалить новость
             elif path.startswith('news/'):
-                news_id = path.split('/')[-1]
-                cur.execute('DELETE FROM news WHERE id = %s', (news_id,))
+                cur.execute('DELETE FROM news WHERE id = %s', (path.split('/')[-1],))
                 conn.commit()
-                return {
-                    'statusCode': 200,
-                    'headers': cors_headers,
-                    'body': json.dumps({'success': True})
-                }
+                return {'statusCode': 200, 'headers': cors_headers, 'body': json.dumps({'success': True})}
+            
+            elif path.startswith('budget/'):
+                cur.execute('DELETE FROM budget_transactions WHERE id = %s', (path.split('/')[-1],))
+                conn.commit()
+                return {'statusCode': 200, 'headers': cors_headers, 'body': json.dumps({'success': True})}
+            
+            elif path.startswith('streams/'):
+                cur.execute('DELETE FROM streams WHERE id = %s', (path.split('/')[-1],))
+                conn.commit()
+                return {'statusCode': 200, 'headers': cors_headers, 'body': json.dumps({'success': True})}
         
-        return {
-            'statusCode': 404,
-            'headers': cors_headers,
-            'body': json.dumps({'error': 'Not found'})
-        }
-        
+        return {'statusCode': 404, 'headers': cors_headers, 'body': json.dumps({'error': 'Not found'})}
+    
     except Exception as e:
-        return {
-            'statusCode': 500,
-            'headers': cors_headers,
-            'body': json.dumps({'error': str(e)})
-        }
+        if conn:
+            conn.rollback()
+        return {'statusCode': 500, 'headers': cors_headers, 'body': json.dumps({'error': str(e)})}
+    
     finally:
         if conn:
             conn.close()
